@@ -1,0 +1,380 @@
+import { useState, useEffect } from "react";
+import {
+    Box,
+    Typography,
+    Card,
+    CardContent,
+    CardMedia,
+    Dialog,
+    TextField,
+    FormControl,
+    InputLabel,
+    Select,
+    MenuItem,
+    SelectChangeEvent,
+    Button,
+    InputAdornment,
+} from "@mui/material";
+import TableRestaurantIcon from '@mui/icons-material/TableRestaurant';
+import SearchIcon from '@mui/icons-material/Search';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import ConfirmDelete from '../../components/Alert/ConfirmDelete/ConfirmDelete';
+import AddHallDialog from './AddHallDialog.tsx';
+import EditHallDialog from './EditHallDialog.tsx';
+import hallA1Image from "../../assets/ảnh 1.webp";
+import hallA2Image from "../../assets/ảnh 2.webp";
+import hallA3Image from "../../assets/ảnh 3.jpg";
+import hallB1Image from "../../assets/ảnh 4.jpg";
+import hallB2Image from "../../assets/ảnh 5.jpg";
+import hallB3Image from "../../assets/ảnh 6.png";
+import hallC1Image from "../../assets/ảnh 7.jpg";
+import hallC2Image from "../../assets/ảnh 8.jpg";
+import hallC3Image from "../../assets/ảnh 9.jpg";
+import hallD1Image from "../../assets/ảnh 10.jpg";
+import hallD2Image from "../../assets/ảnh 11.jpg";
+import hallD3Image from "../../assets/ảnh 12.jpg";
+import hallE1Image from "../../assets/ảnh 13.jpg";
+import hallE2Image from "../../assets/ảnh 14.jpeg";
+import hallE3Image from "../../assets/ảnh 15.jpg";
+const imageMap: Record<string, string> = {
+    "ảnh 1.webp": hallA1Image,
+    "ảnh 2.webp": hallA2Image,
+    "ảnh 3.jpg": hallA3Image,
+    "ảnh 4.jpg": hallB1Image,
+    "ảnh 5.jpg": hallB2Image,
+    "ảnh 6.png": hallB3Image,
+    "ảnh 7.jpg": hallC1Image,
+    "ảnh 8.jpg": hallC2Image,
+    "ảnh 9.jpg": hallC3Image,
+    "ảnh 10.jpg": hallD1Image,
+    "ảnh 11.jpg": hallD2Image,
+    "ảnh 12.jpg": hallD3Image,
+    "ảnh 13.jpg": hallE1Image,
+    "ảnh 14.jpeg": hallE2Image,
+    "ảnh 15.jpg": hallE3Image,
+};
+interface IHallInfo {
+    MASANH: string;
+    TENSANH: string;
+    LOAISANH: string;
+    SOLUONGBANTD: number;
+    DONGIABANTT: number;
+    GHICHU: string;
+    image?: string;
+}
+
+
+export default function HallPage() {
+    const [selectedHall, setSelectedHall] = useState<string | null>(null);
+    const [searchQuery, setSearchQuery] = useState<string>('');
+    const [selectedType, setSelectedType] = useState<string>('all');
+    const [openAddHallDialog, setOpenAddHallDialog] = useState<boolean>(false);
+    const [openConfirmDelete, setOpenConfirmDelete] = useState<boolean>(false);
+    const [hallToDelete, setHallToDelete] = useState<string | null>(null);
+    const [openEditHallDialog, setOpenEditHallDialog] = useState<boolean>(false);
+    const [hallToEdit, setHallToEdit] = useState<IHallInfo | null>(null);
+    const [halls, setHalls] = useState<IHallInfo[]>([]);
+
+    useEffect(() => {
+        fetch("http://localhost:3000/api/sanh")
+            .then(res => res.json())
+            .then(data => setHalls(data));
+    }, []);
+
+    const handleAddHall = (newHall: IHallInfo) => {
+        setHalls(prev => [...prev, newHall]);
+    };
+
+    const filteredHalls = halls.filter(hall =>
+        hall.TENSANH.toLowerCase().includes(searchQuery.toLowerCase()) &&
+        (selectedType === 'all' || hall.LOAISANH === selectedType)
+    );
+    const handleUpdateHall = async (updatedHall: IHallInfo) => {
+    // Gọi API cập nhật
+    await fetch(`http://localhost:3000/api/sanh/${updatedHall.MASANH}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedHall),
+    });
+    // Lấy lại danh sách mới từ DB
+    const res = await fetch("http://localhost:3000/api/sanh");
+    const data = await res.json();
+    setHalls(data);
+};
+    const handleHallClick = (masanh: string) => {
+        setSelectedHall(masanh);
+    };
+
+    const handleCloseDialog = () => {
+        setSelectedHall(null);
+    };
+
+    const handleOpenAddHallDialog = () => {
+        setOpenAddHallDialog(true);
+    };
+
+    const handleCloseAddHallDialog = () => {
+        setOpenAddHallDialog(false);
+    };
+
+    const handleDeleteClick = (masanh: string) => {
+        setHallToDelete(masanh);
+        setOpenConfirmDelete(true);
+    };
+
+    const handleCloseConfirmDelete = () => {
+        setOpenConfirmDelete(false);
+        setHallToDelete(null);
+    };
+
+    const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchQuery(event.target.value);
+    };
+
+    const handleTypeChange = (event: SelectChangeEvent<string>) => {
+        setSelectedType(event.target.value);
+    };
+
+    const handleEditClick = (masanh: string) => {
+        const hall = halls.find(h => h.MASANH === masanh);
+        setHallToEdit(hall || null);
+        setOpenEditHallDialog(true);
+    };
+
+    const handleCloseEditHallDialog = () => {
+        setOpenEditHallDialog(false);
+        setHallToEdit(null);
+    };
+    const handleConfirmDelete = async () => {
+        if (!hallToDelete) return;
+        // Gọi API xóa
+        await fetch(`http://localhost:3000/api/sanh/${hallToDelete}`, {
+            method: "DELETE",
+        });
+        // Cập nhật lại state halls
+        setHalls(prev => prev.filter(hall => hall.MASANH !== hallToDelete));
+        setOpenConfirmDelete(false);
+        setHallToDelete(null);
+    };
+    const hallTypes = ["A", "B", "C", "D", "E"];
+
+    return (
+        <Box sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            height: "100vh",
+            overflow: 'auto',
+            backgroundColor: '#fff',
+            borderRadius: '15px',
+            padding: '20px',
+            boxSizing: 'border-box',
+        }}>
+            <Typography
+                sx={{
+                    userSelect: "none",
+                    color: "var(--text-color)",
+                    fontWeight: "bold",
+                    fontSize: "32px",
+                    marginBottom: "20px",
+                }}
+            >
+                Danh sách sảnh
+            </Typography>
+
+            <Box sx={{ display: 'flex', gap: 2, marginBottom: '20px' }}>
+                <TextField
+                    label="Tìm kiếm theo tên sảnh"
+                    variant="outlined"
+                    value={searchQuery}
+                    onChange={handleSearchChange}
+                    sx={{ flexGrow: 1, borderRadius: '50px', '& .MuiOutlinedInput-root': { borderRadius: '50px' } }}
+                    InputProps={{
+                        startAdornment: (
+                            <InputAdornment position="start">
+                                <SearchIcon />
+                            </InputAdornment>
+                        ),
+                    }}
+                    placeholder="Tìm kiếm"
+                />
+                <FormControl sx={{ minWidth: 120, borderRadius: '50px', '& .MuiOutlinedInput-root': { borderRadius: '50px' } }}>
+                    <InputLabel id="hall-type-select-label">Loại sảnh</InputLabel>
+                    <Select
+                        labelId="hall-type-select-label"
+                        id="hall-type-select"
+                        value={selectedType}
+                        label="Loại sảnh"
+                        onChange={handleTypeChange}
+                    >
+                        <MenuItem value="all">Tất cả</MenuItem>
+                        {hallTypes.map((type) => (
+                            <MenuItem key={type} value={type}>{`Loại ${type}`}</MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
+                <Button
+                    variant="contained"
+                    startIcon={<AddCircleOutlineIcon />}
+                    sx={{
+                        whiteSpace: 'nowrap',
+                        borderRadius: '50px',
+                        backgroundColor: '#4880FF',
+                        '&:hover': {
+                            backgroundColor: '#3a66cc',
+                            boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)',
+                        },
+                    }}
+                    onClick={handleOpenAddHallDialog}
+                >
+                    Thêm sảnh
+                </Button>
+            </Box>
+
+            <Box sx={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: 3,
+                '& > *': {
+                    flex: '0 1 calc(25% - 18px)',
+                    minWidth: '240px',
+                    maxWidth: '1fr',
+                }
+            }}>
+                {filteredHalls.map((hall) => (
+                    <Card
+                        key={hall.MASANH}
+                        sx={{
+                            width: '100%',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            cursor: 'pointer',
+                            transition: 'transform 0.2s',
+                            '&:hover': {
+                                transform: 'scale(1.02)',
+                                boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+                            },
+                            position: 'relative',
+                        }}
+                        onClick={() => handleHallClick(hall.MASANH)}
+                    >
+                        <Box sx={{
+                            position: 'absolute',
+                            top: 8,
+                            right: 8,
+                            display: 'flex',
+                            gap: 1,
+                            zIndex: 2,
+                        }} onClick={e => e.stopPropagation()}>
+                            <Button size="small" sx={{ minWidth: 0, p: 0.5 }} onClick={() => handleEditClick(hall.MASANH)}>
+                                <Box>
+                                    <EditIcon fontSize="small" sx={{ color: '#00e1ff', opacity: 0.85, transition: 'opacity 0.2s' }} />
+                                </Box>
+                            </Button>
+                            <Button size="small" sx={{ minWidth: 0, p: 0.5 }} onClick={() => handleDeleteClick(hall.MASANH)}>
+                                <Box>
+                                    <DeleteIcon fontSize="small" sx={{ color: '#ff0000', opacity: 0.85, transition: 'opacity 0.2s' }} />
+                                </Box>
+                            </Button>
+                        </Box>
+                        <CardMedia
+                            component="img"
+                            image={imageMap[hall.image || ""] || "https://via.placeholder.com/400x220?text=No+Image"}
+                            alt={`Sảnh ${hall.TENSANH}`}
+                            sx={{
+                                width: '100%',
+                                objectFit: 'cover',
+                                height: 220,
+                                borderTopLeftRadius: 8,
+                                borderTopRightRadius: 8,
+                            }}
+                        />
+                        <CardContent sx={{
+                            flexGrow: 1,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            justifyContent: 'space-between',
+                        }}>
+                            <Box>
+                                <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 1, fontSize: '1.5rem' }}>
+                                    {hall.TENSANH}
+                                </Typography>
+                                <Typography color="text.secondary" sx={{ mb: 2, fontSize: '0.9rem', lineHeight: 1.5 }}>
+                                    {hall.GHICHU}
+                                </Typography>
+                                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                                    <AttachMoneyIcon sx={{ fontSize: '1rem', mr: 0.5, color: 'text.secondary' }} />
+                                    <Typography variant="body2" color="text.secondary">
+                                        Đơn giá bàn tối thiểu: {hall.DONGIABANTT.toLocaleString('vi-VN')} VNĐ
+                                    </Typography>
+                                </Box>
+                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                    <TableRestaurantIcon sx={{ fontSize: '1rem', mr: 0.5, color: 'text.secondary' }} />
+                                    <Typography variant="body2" color="text.secondary">
+                                        Tối đa: {hall.SOLUONGBANTD} bàn
+                                    </Typography>
+                                </Box>
+                            </Box>
+                        </CardContent>
+                    </Card>
+                ))}
+            </Box>
+
+            <Dialog
+                open={selectedHall !== null}
+                onClose={handleCloseDialog}
+                maxWidth="sm"
+                fullWidth
+                PaperProps={{
+                    sx: {
+                        borderRadius: 4,
+                        boxShadow: '0 8px 32px rgba(0,0,0,0.18)',
+                        p: 0,
+                        overflow: 'hidden',
+                        background: 'linear-gradient(135deg, #f8fafc 60%, #e0e7ef 100%)',
+                    }
+                }}
+            >
+                {selectedHall && (() => {
+                    const hallDetails = halls.find(h => h.MASANH === selectedHall);
+                    if (!hallDetails) return null;
+                    return (
+                        <Box>
+                            <Box sx={{ width: '100%', height: 240, overflow: 'hidden' }}>
+                                <img src={imageMap[hallDetails.image || ""] || "https://via.placeholder.com/400x220?text=No+Image"} alt={hallDetails.TENSANH} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            </Box>
+                            <Box sx={{ p: 3, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+                                <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#2a3b5d', mb: 1, textAlign: 'center' }}>
+                                    {hallDetails.TENSANH}
+                                </Typography>
+                                <Box sx={{ display: 'flex', gap: 3, mb: 1 }}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                        <TableRestaurantIcon sx={{ color: '#4880FF' }} />
+                                        <Typography variant="body1">Loại: <b>{hallDetails.LOAISANH}</b></Typography>
+                                    </Box>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                        <AttachMoneyIcon sx={{ color: '#00b894' }} />
+                                        <Typography variant="body1">Giá bàn: <b>{hallDetails.DONGIABANTT.toLocaleString('vi-VN')} VNĐ</b></Typography>
+                                    </Box>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                        <TableRestaurantIcon sx={{ color: '#ff9800' }} />
+                                        <Typography variant="body1">Tối đa: <b>{hallDetails.SOLUONGBANTD}</b> bàn</Typography>
+                                    </Box>
+                                </Box>
+                                <Typography variant="body2" sx={{ color: '#555', textAlign: 'center', mb: 2 }}>
+                                    {hallDetails.GHICHU}
+                                </Typography>
+                            </Box>
+                        </Box>
+                    );
+                })()}
+            </Dialog>
+
+            <AddHallDialog open={openAddHallDialog} onClose={handleCloseAddHallDialog} hallTypes={hallTypes} onAddHall={handleAddHall} />
+            <EditHallDialog open={openEditHallDialog} onClose={handleCloseEditHallDialog} hall={hallToEdit} hallTypes={hallTypes} onUpdateHall={handleUpdateHall} />
+            <ConfirmDelete open={openConfirmDelete} onClose={handleCloseConfirmDelete} onConfirm={handleConfirmDelete} />
+        </Box>
+    );
+}
