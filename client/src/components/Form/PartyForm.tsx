@@ -441,6 +441,20 @@ export default function PartyForm({
                     >
                         Xuất hóa đơn
                     </Button>
+                    <Button
+                        variant="contained"
+                        color="success"
+                        onClick={() => onSubmit(form)}
+                        sx={{
+                            fontSize: "14px",
+                            fontWeight: "bold",
+                            borderRadius: '8px',
+                            backgroundColor: "#4caf50",
+                            textTransform: "none",
+                        }}
+                    >
+                        Lưu
+                    </Button>
                 </DialogActions>
             }
         </Dialog>

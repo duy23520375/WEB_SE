@@ -15,7 +15,7 @@ const ServiceAddDialog: React.FC<ServiceAddDialogProps> = ({ open, onClose, onSa
         price: '',
         category: '',
     });
-
+    
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setForm({ ...form, [e.target.name]: e.target.value });
     };
@@ -25,9 +25,16 @@ const ServiceAddDialog: React.FC<ServiceAddDialogProps> = ({ open, onClose, onSa
     };
 
     const handleSave = () => {
-        onSave(form);
-        setForm({ name: '', description: '', price: '', category: '' });
-    };
+    if (!form.name || !form.category || !form.price) {
+        alert("Vui lòng nhập đầy đủ thông tin!");
+        return;
+    }
+    onSave({
+        ...form,
+        price: Number(form.price), // Đảm bảo giá là số
+    });
+    setForm({ name: '', description: '', price: '', category: '' });
+};
 
     return (
         <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>

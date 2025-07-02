@@ -13,12 +13,12 @@ const MonanSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
+  GHICHU: {
+    type: String
+  },
   LOAI: {
     type: String,
     required: true
-  },
-  GHICHU: {
-    type: String
   }
 })
 

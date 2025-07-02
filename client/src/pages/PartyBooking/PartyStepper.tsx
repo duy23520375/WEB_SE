@@ -6,6 +6,7 @@ import StepFood from "./steps/StepFood";
 import StepService from "./steps/StepService";
 import StepConfirm from "./steps/StepConfirm";
 import { useFormContext } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 
 const steps = [
   "Thông tin khách hàng",
@@ -15,23 +16,47 @@ const steps = [
   "Xác nhận hóa đơn",
 ];
 
-
-const stepFields = [
-  ["groom", "bride", "phone"],
-  ["date", "shift", "hall", "tables", "reserveTables"],
-  ["foods"],
-];
-
 export default function PartyStepper() {
   const [activeStep, setActiveStep] = useState(0);
   const methods = useFormContext();
   const { trigger, handleSubmit } = methods;
+  const navigate = useNavigate();
 
   const handleNext = async () => {
+    // Validate các trường của step hiện tại trước khi next
+    let fieldsToValidate: string[] = [];
+    switch (activeStep) {
+      case 0:
+        fieldsToValidate = ["groom", "bride", "phone"];
+        break;
+      case 1:
+        fieldsToValidate = ["date", "shift", "hall", "tables", "reserveTables"];
+        break;
+      case 2:
+        fieldsToValidate = ["foods"];
+        break;
+      // Các bước khác nếu cần
+      default:
+        fieldsToValidate = [];
+    }
+    if (fieldsToValidate.length > 0) {
+      const valid = await trigger(fieldsToValidate);
+      if (!valid) return;
+    }
     setActiveStep((prev) => prev + 1);
   };
 
   const handleBack = () => setActiveStep((prev) => prev - 1);
+
+  // Hàm submit cuối cùng
+  const onSubmit = async (data: any) => {
+    await fetch("http://localhost:3000/api/tieccuoi", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    navigate("/tiec-cuoi");
+  };
 
   const renderStep = () => {
     switch (activeStep) {
@@ -138,7 +163,9 @@ export default function PartyStepper() {
                 borderRadius: '8px',
                 backgroundColor: "#4880FF",
                 textTransform: "none",
-              }}>
+              }}
+              onClick={handleSubmit(onSubmit)}
+            >
               Đặt tiệc
             </Button>
           )}

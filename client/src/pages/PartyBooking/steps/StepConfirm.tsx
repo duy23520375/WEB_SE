@@ -1,23 +1,78 @@
-import { Box, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
+import { Box, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Button } from "@mui/material";
 import { useFormContext } from "react-hook-form";
 import { formatDate } from "../../../utils/formatDate";
 import { IFoodBooking } from "../../../interfaces/food.interface";
 import { IServiceBooking } from "../../../interfaces/service.interface";
+import { useState } from "react";
 
 export default function StepConfirm() {
-    const {
-        watch
-    } = useFormContext();
+    const { watch, getValues, reset } = useFormContext();
+    const [loading, setLoading] = useState(false);
+    const [success, setSuccess] = useState(false);
 
-    const selectedFoods: IFoodBooking[] = watch("foods") || []; // Danh sách món đã chọn
-    const selectedServices: IServiceBooking[] = watch("services") || []; // Danh sách dịch vụ đã chọn
-
+    const selectedFoods: IFoodBooking[] = watch("foods") || [];
+    const selectedServices: IServiceBooking[] = watch("services") || [];
     const totalTables = (watch("tables") || 0) + (watch("reserveTables") || 0);
     const tablePrice = selectedFoods.reduce((sum, item) => sum + item.price, 0);
     const totalTablesPrice = totalTables * tablePrice;
     const servicesPrice = selectedServices.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     const totalBill = totalTablesPrice + servicesPrice;
 
+    // Hàm xử lý đặt tiệc
+    const handleCreateParty = async () => {
+    setLoading(true);
+    setSuccess(false);
+    const data = getValues();
+    // Tìm maxTable của sảnh đã chọn
+    let maxTable = 0;
+    if (data.hall && data.hall.maxTable) {
+        maxTable = data.hall.maxTable;
+    } else if (data.hall && data.hall.SOLUONGBANTD) {
+        maxTable = data.hall.SOLUONGBANTD;
+    }
+    const reserveTables = Math.max(0, maxTable - (data.tables || 0));
+    console.log("Dữ liệu gửi lên backend:", {
+        TENCR: data.groom,
+        TENCD: data.bride,
+        SDT: data.phone,
+        MASANH: data.hall?.id || data.hall?.MASANH,
+        NGAYDAI: data.date,
+        CA: data.shift,
+        SOLUONGBAN: data.tables,
+        SOBANDT: reserveTables, // cập nhật đúng số bàn dự trữ
+        TIENCOC: totalBill * 0.1,
+    });
+    try {
+        const res = await fetch("http://localhost:3000/api/tieccuoi", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                TENCR: data.groom,
+                TENCD: data.bride,
+                SDT: data.phone,
+                MASANH: data.hall?.id || data.hall?.MASANH,
+                NGAYDAI: data.date,
+                CA: data.shift,
+                SOLUONGBAN: data.tables,
+                SOBANDT: reserveTables, // cập nhật đúng số bàn dự trữ
+                TIENCOC: totalBill * 0.1,
+                foods: data.foods,
+                services: data.services,
+            }),
+        });
+        if (res.ok) {
+            setSuccess(true);
+            reset();
+            alert("Đặt tiệc thành công!");
+        } else {
+            alert("Đặt tiệc thất bại!");
+        }
+    } catch (err) {
+        alert("Có lỗi xảy ra!");
+    }
+    setLoading(false);
+};
+    console.log("hall object:", watch("hall"));
     return (
         <Box
             sx={{
@@ -39,6 +94,7 @@ export default function StepConfirm() {
                 },
             }}
         >
+            
             <Typography sx={{
                 fontWeight: 'bold',
                 fontSize: '20px',
@@ -51,151 +107,51 @@ export default function StepConfirm() {
                 width: '75%',
                 rowGap: '10px'
             }}>
-                <Box sx={{
-                    display: 'flex',
-                    gap: '10px',
-                    width: '30%',
-                }}>
-                    <Typography sx={{ fontSize: '16px', fontWeight: 'bold' }}>
-                        Tên chú rể:
-                    </Typography>
-                    <Typography sx={{ fontSize: '16px', }}>
-                        {watch("groom")}
-                    </Typography>
+                <Box sx={{ display: 'flex', gap: '10px', width: '30%' }}>
+                    <Typography sx={{ fontSize: '16px', fontWeight: 'bold' }}>Tên chú rể:</Typography>
+                    <Typography sx={{ fontSize: '16px' }}>{watch("groom")}</Typography>
                 </Box>
-
-                <Box sx={{
-                    display: 'flex',
-                    gap: '10px',
-                    width: '30%',
-                }}>
-                    <Typography sx={{ fontSize: '16px', fontWeight: 'bold' }}>
-                        Tên cô dâu:
-                    </Typography>
-                    <Typography sx={{ fontSize: '16px', }}>
-                        {watch("bride")}
-                    </Typography>
+                <Box sx={{ display: 'flex', gap: '10px', width: '30%' }}>
+                    <Typography sx={{ fontSize: '16px', fontWeight: 'bold' }}>Tên cô dâu:</Typography>
+                    <Typography sx={{ fontSize: '16px' }}>{watch("bride")}</Typography>
                 </Box>
-
-                <Box sx={{
-                    display: 'flex',
-                    gap: '10px',
-                    width: '30%',
-                }}>
-                    <Typography sx={{ fontSize: '16px', fontWeight: 'bold' }}>
-                        Số điện thoại:
-                    </Typography>
-                    <Typography sx={{ fontSize: '16px', }}>
-                        {watch("phone")}
-                    </Typography>
+                <Box sx={{ display: 'flex', gap: '10px', width: '30%' }}>
+                    <Typography sx={{ fontSize: '16px', fontWeight: 'bold' }}>Số điện thoại:</Typography>
+                    <Typography sx={{ fontSize: '16px' }}>{watch("phone")}</Typography>
                 </Box>
-
-                <Box sx={{
-                    display: 'flex',
-                    gap: '10px',
-                    width: '30%',
-                }}>
-                    <Typography sx={{ fontSize: '16px', fontWeight: 'bold' }}>
-                        Sảnh:
-                    </Typography>
-                    <Typography sx={{ fontSize: '16px', }}>
-                        {watch("hall").name}
-                    </Typography>
+                
+                <Box sx={{ display: 'flex', gap: '10px', width: '30%' }}>
+                    <Typography sx={{ fontSize: '16px', fontWeight: 'bold' }}>Sảnh:</Typography>
+                    <Typography sx={{ fontSize: '16px' }}>{watch("hall")?.type}</Typography>
                 </Box>
-
-                <Box sx={{
-                    display: 'flex',
-                    gap: '10px',
-                    width: '30%',
-                }}>
-                    <Typography sx={{ fontSize: '16px', fontWeight: 'bold' }}>
-                        Ngày đãi tiệc:
-                    </Typography>
-                    <Typography sx={{ fontSize: '16px', }}>
-                        {formatDate(watch("date"))}
-                    </Typography>
+                <Box sx={{ display: 'flex', gap: '10px', width: '30%' }}>
+                    <Typography sx={{ fontSize: '16px', fontWeight: 'bold' }}>Ngày đãi tiệc:</Typography>
+                    <Typography sx={{ fontSize: '16px' }}>{formatDate(watch("date"))}</Typography>
                 </Box>
-
-                <Box sx={{
-                    display: 'flex',
-                    gap: '10px',
-                    width: '30%',
-                }}>
-                    <Typography sx={{ fontSize: '16px', fontWeight: 'bold' }}>
-                        Ca:
-                    </Typography>
-                    <Typography sx={{ fontSize: '16px', }}>
-                        {watch("shift")}
-                    </Typography>
+                <Box sx={{ display: 'flex', gap: '10px', width: '30%' }}>
+                    <Typography sx={{ fontSize: '16px', fontWeight: 'bold' }}>Ca:</Typography>
+                    <Typography sx={{ fontSize: '16px' }}>{watch("shift")}</Typography>
                 </Box>
-
-                <Box sx={{
-                    display: 'flex',
-                    gap: '10px',
-                    width: '30%',
-                }}>
-                    <Typography sx={{ fontSize: '16px', fontWeight: 'bold' }}>
-                        Tổng tiền:
-                    </Typography>
-                    <Typography sx={{ fontSize: '16px', }}>
-                        {totalBill.toLocaleString('vi-VN')} VND
-                    </Typography>
+                <Box sx={{ display: 'flex', gap: '10px', width: '30%' }}>
+                    <Typography sx={{ fontSize: '16px', fontWeight: 'bold' }}>Tổng tiền:</Typography>
+                    <Typography sx={{ fontSize: '16px' }}>{totalBill.toLocaleString('vi-VN')} VND</Typography>
                 </Box>
-
-                <Box sx={{
-                    display: 'flex',
-                    gap: '10px',
-                    width: '30%',
-                }}>
-                    <Typography sx={{ fontSize: '16px', fontWeight: 'bold' }}>
-                        Tiền đặt cọc:
-                    </Typography>
-                    <Typography sx={{ fontSize: '16px', }}>
-                        {(totalBill * 0.1).toLocaleString('vi-VN')} VND
-                    </Typography>
+                <Box sx={{ display: 'flex', gap: '10px', width: '30%' }}>
+                    <Typography sx={{ fontSize: '16px', fontWeight: 'bold' }}>Tiền đặt cọc:</Typography>
+                    <Typography sx={{ fontSize: '16px' }}>{(totalBill * 0.1).toLocaleString('vi-VN')} VND</Typography>
                 </Box>
-
-                <Box sx={{
-                    display: 'flex',
-                    gap: '10px',
-                    width: '30%',
-                }}>
-                    <Typography sx={{ fontSize: '16px', fontWeight: 'bold' }}>
-                        Còn lại:
-                    </Typography>
-                    <Typography sx={{ fontSize: '16px', }}>
-                        {(totalBill * 0.9).toLocaleString('vi-VN')} VND
-                    </Typography>
+                <Box sx={{ display: 'flex', gap: '10px', width: '30%' }}>
+                    <Typography sx={{ fontSize: '16px', fontWeight: 'bold' }}>Còn lại:</Typography>
+                    <Typography sx={{ fontSize: '16px' }}>{(totalBill * 0.9).toLocaleString('vi-VN')} VND</Typography>
                 </Box>
-
-                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', width: '30%', }}>
-                    Đặt bàn:
-                </Typography>
-
-                <Box sx={{
-                    display: 'flex',
-                    gap: '10px',
-                    width: '30%',
-                }}>
-                    <Typography sx={{ fontSize: '16px', fontWeight: 'bold' }}>
-                        Số lượng bàn:
-                    </Typography>
-                    <Typography sx={{ fontSize: '16px', }}>
-                        {watch("tables") || 0}
-                    </Typography>
+                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', width: '30%' }}>Đặt bàn:</Typography>
+                <Box sx={{ display: 'flex', gap: '10px', width: '30%' }}>
+                    <Typography sx={{ fontSize: '16px', fontWeight: 'bold' }}>Số lượng bàn:</Typography>
+                    <Typography sx={{ fontSize: '16px' }}>{watch("tables") || 0}</Typography>
                 </Box>
-
-                <Box sx={{
-                    display: 'flex',
-                    gap: '10px',
-                    width: '30%',
-                }}>
-                    <Typography sx={{ fontSize: '16px', fontWeight: 'bold' }}>
-                        Số bàn dự trữ:
-                    </Typography>
-                    <Typography sx={{ fontSize: '16px', }}>
-                        {watch("reserveTables") || 0}
-                    </Typography>
+                <Box sx={{ display: 'flex', gap: '10px', width: '30%' }}>
+                    <Typography sx={{ fontSize: '16px', fontWeight: 'bold' }}>Số bàn dự trữ:</Typography>
+                    <Typography sx={{ fontSize: '16px' }}>{(() => { let maxTable = 0; const hall = watch("hall"); if (hall && hall.maxTable) { maxTable = hall.maxTable; } else if (hall && hall.SOLUONGBANTD) { maxTable = hall.SOLUONGBANTD; } return Math.max(0, maxTable - (watch("tables") || 0)); })()}</Typography>
                 </Box>
             </Box>
 
@@ -280,6 +236,22 @@ export default function StepConfirm() {
                     </TableBody>
                 </Table>
             </TableContainer>
+
+            <Box sx={{ display: "flex", justifyContent: "center", width: "100%", mt: 2 }}>
+                <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleCreateParty}
+                    disabled={loading}
+                >
+                    {loading ? "Đang đặt..." : "Đặt tiệc"}
+                </Button>
+            </Box>
+            {success && (
+                <Typography color="success.main" sx={{ mt: 1 }}>
+                    Đặt tiệc thành công!
+                </Typography>
+            )}
         </Box>
     );
 }

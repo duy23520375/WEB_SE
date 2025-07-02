@@ -49,6 +49,7 @@ router.put('/:id', async (req,res)=> {
 router.delete('/:id', async (req,res)=> {
   try {
     const monanId = req.params.id;
+    console.log("BE nhận được _id:", monanId);
     const response = await Monan.findByIdAndDelete(monanId)
     if (!response) {
       return res.status(404).json({error: 'Món ăn not found'})

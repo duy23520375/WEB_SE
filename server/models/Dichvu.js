@@ -15,7 +15,11 @@ const DichvuSchema = new mongoose.Schema({
   },
   GHICHU: {
     type: String
-  }
+  },
+  DANHMUC: {
+    type: String,
+    required: false
+  },
 })
 
 const Dichvu = mongoose.model('Dichvu', DichvuSchema);

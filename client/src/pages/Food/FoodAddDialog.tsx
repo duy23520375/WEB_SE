@@ -26,9 +26,16 @@ const FoodAddDialog: React.FC<FoodAddDialogProps> = ({ open, onClose, onSave, ca
     };
 
     const handleSave = () => {
-        onSave(form);
-        setForm({ name: '', description: '', price: '', category: '', image: null });
-    };
+    if (!form.name || !form.price) {
+        alert("Vui lòng nhập đầy đủ tên món và giá!");
+        return;
+    }
+    onSave({
+        ...form,
+        price: Number(form.price),
+    });
+    setForm({ name: '', description: '', price: '', category: '', image: null });
+};
 
     return (
         <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>

@@ -51,7 +51,7 @@ export default function StepCustomerInfo() {
                             placeholder="Nhập tên chú rể"
                             {...field}
                             error={!!errors.groom}
-                            helperText={errors.groom?.message}
+                            helperText={errors.groom?.message }
                         />
                     </Box>
                 )}

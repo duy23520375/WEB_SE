@@ -65,7 +65,25 @@ interface IHallInfo {
     GHICHU: string;
     image?: string;
 }
-
+function getHallImage(tenSanh: string) {
+    const ten = tenSanh.toLowerCase();
+    if (ten.includes("grand ballroom a1")) return hallA1Image;
+    if (ten.includes("crystal hall a2")) return hallA2Image;
+    if (ten.includes("diamond suite a3")) return hallA3Image;
+    if (ten.includes("pearl grand b1")) return hallB1Image;
+    if (ten.includes("b2")) return hallB2Image;
+    if (ten.includes("b3")) return hallB3Image;
+    if (ten.includes("c1")) return hallC1Image;
+    if (ten.includes("c2")) return hallC2Image;
+    if (ten.includes("c3")) return hallC3Image;
+    if (ten.includes("d1")) return hallD1Image;
+    if (ten.includes("d2")) return hallD2Image;
+    if (ten.includes("d3")) return hallD3Image;
+    if (ten.includes("e1")) return hallE1Image;
+    if (ten.includes("e2")) return hallE2Image;
+    if (ten.includes("e3")) return hallE3Image;
+    return "https://via.placeholder.com/400x220?text=No+Image";
+}
 
 export default function HallPage() {
     const [selectedHall, setSelectedHall] = useState<string | null>(null);
@@ -281,7 +299,7 @@ export default function HallPage() {
                         </Box>
                         <CardMedia
                             component="img"
-                            image={imageMap[hall.image || ""] || "https://via.placeholder.com/400x220?text=No+Image"}
+                            image={getHallImage(hall.TENSANH)}
                             alt={`Sảnh ${hall.TENSANH}`}
                             sx={{
                                 width: '100%',
@@ -343,7 +361,7 @@ export default function HallPage() {
                     return (
                         <Box>
                             <Box sx={{ width: '100%', height: 240, overflow: 'hidden' }}>
-                                <img src={imageMap[hallDetails.image || ""] || "https://via.placeholder.com/400x220?text=No+Image"} alt={hallDetails.TENSANH} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                <img src={getHallImage(hallDetails.TENSANH)} alt={hallDetails.TENSANH} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                             </Box>
                             <Box sx={{ p: 3, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
                                 <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#2a3b5d', mb: 1, textAlign: 'center' }}>

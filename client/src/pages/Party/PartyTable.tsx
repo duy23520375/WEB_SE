@@ -23,11 +23,13 @@ export default function PartyTable({
     searchKey,
     handleEdit,
     handleDelete,
+    halls,
 }: {
     data: IParty[],
     searchKey: string,
     handleEdit: (course: any) => void,
-    handleDelete: (id: any) => void
+    handleDelete: (id: any) => void,
+    halls: any[], // Nhận thêm prop halls
 }) {
     const [order, setOrder] = useState<'asc' | 'desc'>('asc');
     const [orderBy, setOrderBy] = useState<PartyKey>('id');
@@ -54,8 +56,8 @@ export default function PartyTable({
 
         return 0;
     });
-
-
+    
+    
     return (
         <TableContainer
             sx={{
@@ -276,191 +278,199 @@ export default function PartyTable({
 
                     </TableRow>
                 </TableHead>
+                
                 <TableBody>
-                    {sortedParties.map((party) => (
-                        <TableRow key={party.id} hover>
-                            {/* ID */}
-                            <TableCell
-                                align="center"
-                                sx={{
-                                    color: "var(--text-color)",
-                                    width: "4%",
-                                    fontWeight: 'bold',
-                                }}
-                            >
-                                {party.code}
-                            </TableCell>
+                    {sortedParties.map((party) => {
+                        // Debug: xem dữ liệu hall
 
-                            {/* Groom */}
-                            <TableCell
-                                sx={{
-                                    color: "var(--text-color)",
-                                    maxWidth: { xs: 80, md: 120, },
-                                    whiteSpace: 'nowrap',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                }}
-                                title={party.groom}
-                            >
-                                {party.groom}
-                            </TableCell>
-
-                            {/* Bride */}
-                            <TableCell
-                                sx={{
-                                    color: "var(--text-color)",
-                                    maxWidth: { xs: 80, md: 120, },
-                                    whiteSpace: 'nowrap',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                }}
-                                title={party.bride}
-                            >
-                                {party.bride}
-                            </TableCell>
-
-                            {/* Phone */}
-                            <TableCell
-                                align="center"
-                                sx={{
-                                    color: "var(--text-color)",
-                                    width: "10%",
-                                }}
-                                title={party.phone}
-                            >
-                                {party.phone}
-                            </TableCell>
-
-                            {/* Date */}
-                            <TableCell
-                                align="center"
-                                sx={{
-                                    color: "var(--text-color)",
-                                    width: "10%",
-                                }}
-                            >
-                                {party.date ? dayjs(party.date).format("DD/MM/YYYY") : ""}
-                            </TableCell>
-
-                            {/* Shift */}
-                            <TableCell
-                                align="center"
-                                sx={{
-                                    width: "5%",
-                                }}
-                            >
-                                <Box
+                        return (
+                            <TableRow key={party.id} hover>
+                                {/* ID */}
+                                <TableCell
+                                    align="center"
                                     sx={{
-                                        display: 'inline-flex',
-                                        paddingX: 1.5,
-                                        paddingY: 0.5,
-                                        borderRadius: 2,
+                                        color: "var(--text-color)",
+                                        width: "4%",
                                         fontWeight: 'bold',
-                                        backgroundColor: defaultBgColorMap[party.shift],
-                                        color: defaultTextColorMap[party.shift],
                                     }}
                                 >
-                                    {party.shift}
-                                </Box>
-                            </TableCell>
+                                    {party.code}
+                                </TableCell>
 
-                            {/* Hall */}
-                            <TableCell
-                                align="center"
-                                sx={{
-                                    width: "5%",
-                                }}
-                            >
-                                <Box
+                                {/* Groom */}
+                                <TableCell
                                     sx={{
-                                        display: 'inline-flex',
-                                        paddingX: 1.5,
-                                        paddingY: 0.5,
-                                        borderRadius: 2,
-                                        fontWeight: 'bold',
-                                        backgroundColor: defaultBgColorMap[party.hall],
-                                        color: defaultTextColorMap[party.hall],
+                                        color: "var(--text-color)",
+                                        maxWidth: { xs: 80, md: 120, },
+                                        whiteSpace: 'nowrap',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                    }}
+                                    title={party.groom}
+                                >
+                                    {party.groom}
+                                </TableCell>
+
+                                {/* Bride */}
+                                <TableCell
+                                    sx={{
+                                        color: "var(--text-color)",
+                                        maxWidth: { xs: 80, md: 120, },
+                                        whiteSpace: 'nowrap',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                    }}
+                                    title={party.bride}
+                                >
+                                    {party.bride}
+                                </TableCell>
+
+                                {/* Phone */}
+                                <TableCell
+                                    align="center"
+                                    sx={{
+                                        color: "var(--text-color)",
+                                        width: "10%",
+                                    }}
+                                    title={party.phone}
+                                >
+                                    {party.phone}
+                                </TableCell>
+
+                                {/* Date */}
+                                <TableCell
+                                    align="center"
+                                    sx={{
+                                        color: "var(--text-color)",
+                                        width: "10%",
                                     }}
                                 >
-                                    {party.hall}
-                                </Box>
-                            </TableCell>
+                                    {party.date ? dayjs(party.date).format("DD/MM/YYYY") : ""}
+                                </TableCell>
 
-                            {/* Deposit */}
-                            <TableCell
-                                align="center"
-                                sx={{
-                                    color: "var(--text-color)",
-                                    width: "10%",
-                                }}
-                            >
-                                {party.deposit}
-                            </TableCell>
-
-                            {/* Tables */}
-                            <TableCell
-                                align="center"
-                                sx={{
-                                    color: "var(--text-color)",
-                                    width: "10%",
-                                }}
-                            >
-                                {party.deposit}
-                            </TableCell>
-
-                            {/* Reserve tables */}
-                            <TableCell
-                                align="center"
-                                sx={{
-                                    color: "var(--text-color)",
-                                    width: "7%",
-                                }}
-                            >
-                                {party.reserveTables}
-                            </TableCell>
-
-                            {/* Status */}
-                            <TableCell
-                                align="center"
-                                sx={{
-                                    width: "10%",
-                                }}
-                            >
-                                <Box
+                                {/* Shift */}
+                                <TableCell
+                                    align="center"
                                     sx={{
-                                        display: 'inline-flex',
-                                        paddingX: 1.5,
-                                        paddingY: 0.5,
-                                        borderRadius: 2,
-                                        fontWeight: 'bold',
-                                        backgroundColor: defaultBgColorMap[party.status],
-                                        color: defaultTextColorMap[party.status],
+                                        width: "5%",
                                     }}
                                 >
-                                    {party.status}
-                                </Box>
-                            </TableCell>
+                                    <Box
+                                        sx={{
+                                            display: 'inline-flex',
+                                            paddingX: 1.5,
+                                            paddingY: 0.5,
+                                            borderRadius: 2,
+                                            fontWeight: 'bold',
+                                            backgroundColor: defaultBgColorMap[party.shift],
+                                            color: defaultTextColorMap[party.shift],
+                                        }}
+                                    >
+                                        {party.shift}
+                                    </Box>
+                                </TableCell>
 
-                            {/* Actions */}
-                            <TableCell
-                                align="center"
-                                sx={{
-                                    width: "5%",
-                                    padding: 0,
-                                }}
-                            >
-                                <IconButton size="small" sx={{ color: '#00d4ff' }}
-                                    onClick={() => handleEdit(party)}>
-                                    <EditOutlined fontSize="small" />
-                                </IconButton>
-                                <IconButton size="small" sx={{ color: '#ff0000' }}
-                                    onClick={() => handleDelete(party.id)}>
-                                    <DeleteOutline fontSize="small" />
-                                </IconButton>
-                            </TableCell>
-                        </TableRow>
+                                {/* Hall - loại sảnh */}
+                                <TableCell
+                                    align="center"
+                                    sx={{
+                                        width: "5%",
+                                    }}
+                                >
+                                    <Box
+                                        sx={{
+                                            display: 'inline-flex',
+                                            paddingX: 1.5,
+                                            paddingY: 0.5,
+                                            borderRadius: 2,
+                                            fontWeight: 'bold',
+                                            backgroundColor: defaultBgColorMap[party.hall],
+                                            color: defaultTextColorMap[party.hall],
+                                        }}
+                                    >
+                                        {/* Hiển thị loại sảnh thay vì mã sảnh */}
+                                        {(() => {
+                                            const hallObj = halls.find(h => h.MASANH === party.hall);
+                                            return hallObj ? hallObj.LOAISANH : party.hall;
+                                        })()}
+                                    </Box>
+                                </TableCell>
 
-                    ))}
+                                {/* Deposit */}
+                                <TableCell
+                                    align="center"
+                                    sx={{
+                                        color: "var(--text-color)",
+                                        width: "10%",
+                                    }}
+                                >
+                                    {party.deposit}
+                                </TableCell>
+
+                                {/* Tables */}
+                                <TableCell
+                                    align="center"
+                                    sx={{
+                                        color: "var(--text-color)",
+                                        width: "10%",
+                                    }}
+                                >
+                                    {party.tables}
+                                </TableCell>
+
+                                {/* Reserve tables */}
+                                <TableCell
+                                    align="center"
+                                    sx={{
+                                        color: "var(--text-color)",
+                                        width: "7%",
+                                    }}
+                                >
+                                    {party.reserveTables}
+                                </TableCell>
+
+                                {/* Status */}
+                                <TableCell
+                                    align="center"
+                                    sx={{
+                                        width: "10%",
+                                    }}
+                                >
+                                    <Box
+                                        sx={{
+                                            display: 'inline-flex',
+                                            paddingX: 1.5,
+                                            paddingY: 0.5,
+                                            borderRadius: 2,
+                                            fontWeight: 'bold',
+                                            backgroundColor: defaultBgColorMap[party.status],
+                                            color: defaultTextColorMap[party.status],
+                                        }}
+                                    >
+                                        {party.status}
+                                    </Box>
+                                </TableCell>
+
+                                {/* Actions */}
+                                <TableCell
+                                    align="center"
+                                    sx={{
+                                        width: "5%",
+                                        padding: 0,
+                                    }}
+                                >
+                                    <IconButton size="small" sx={{ color: '#00d4ff' }}
+                                        onClick={() => handleEdit(party)}>
+                                        <EditOutlined fontSize="small" />
+                                    </IconButton>
+                                    <IconButton size="small" sx={{ color: '#ff0000' }}
+                                        onClick={() => handleDelete(party.id)}>
+                                        <DeleteOutline fontSize="small" />
+                                    </IconButton>
+                                </TableCell>
+                            </TableRow>
+                        );
+                    })}
                     {sortedParties.length === 0 && (
                         <TableRow>
                             <TableCell colSpan={12} align="center">

@@ -29,6 +29,7 @@ export default function PartyPage() {
     const navigate = useNavigate();
 
     const [parties, setParties] = useState<IParty[]>([]);
+    const [halls, setHalls] = useState<any[]>([]); // Thêm state lưu danh sách sảnh
     useEffect(() => {
         fetch("http://localhost:3000/api/tieccuoi")
             .then(res => res.json())
@@ -56,6 +57,10 @@ export default function PartyPage() {
     });
     setParties(mapped);
 });
+        // Fetch danh sách sảnh
+        fetch("http://localhost:3000/api/sanh")
+            .then(res => res.json())
+            .then(data => setHalls(data));
     }, []);
 
     // Các useState khác phải đặt ở đây, KHÔNG đặt sau useEffect!
@@ -63,6 +68,7 @@ export default function PartyPage() {
     const [searchBy, setSearchBy] = useState<PartyKey>("groom");
     const [filterShift, setFilterShift] = useState("");
     const [filterHall, setFilterHall] = useState("");
+    
     const [fromDate, setFromDate] = useState(dayjs('2000-01-01').toISOString());
     const [toDate, setToDate] = useState(dayjs('2100-12-31').toISOString());
     const [isPartyFormOpen, setIsPartyFormOpen] = useState(false);
@@ -72,7 +78,40 @@ export default function PartyPage() {
     const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
     const [deleteId, setDeleteId] = useState(null);
 
-    
+    const fetchParties = () => {
+    fetch("http://localhost:3000/api/tieccuoi")
+        .then(res => res.json())
+        .then(data => {
+            const mapped = data.map((item: any, idx: number) => {
+                let status = "Đã đặt cọc";
+                if (item.DAHUY) status = "Đã huỷ";
+                else if (item.DATHANHTOAN) status = "Đã thanh toán";
+                else if (item.DATOCHUC) status = "Đã tổ chức";
+                return {
+                    code: item.MATIEC,
+                    id: item._id,
+                    groom: item.TENCR,
+                    bride: item.TENCD,
+                    phone: item.SDT,
+                    shift: item.CA,
+                    hall: item.MASANH,
+                    date: item.NGAYDAI,
+                    deposit: item.TIENCOC,
+                    tables: item.SOLUONGBAN,
+                    reserveTables: item.SOBANDT,
+                    status,
+                };
+            });
+            setParties(mapped);
+        });
+};
+        useEffect(() => {
+            fetchParties(); // tải danh sách tiệc cưới ban đầu
+            fetch("http://localhost:3000/api/sanh")
+                .then(res => res.json())
+                .then(data => setHalls(data));
+        }, []);
+
     const filteredParties = parties.filter((party) => {
         const partyDate = dayjs(party.date);
         const from = dayjs(fromDate);
@@ -427,27 +466,56 @@ export default function PartyPage() {
                 searchKey={searchKey}
                 handleEdit={handleEdit}
                 handleDelete={handleDelete}
+                halls={halls} // Truyền thêm prop halls
             />
 
             {/* Form + ConfirmDelete */}
             <PartyForm
                 open={isPartyFormOpen}
                 onClose={() => setIsPartyFormOpen(false)}
-                onSubmit={(_data) => {
-                    if (editData) {
-                        // update logic
-                    } else {
-                        // add logic
-                    }
-                    setIsPartyFormOpen(false);
-                }}
+                onSubmit={(data) => {
+    const payload = {
+        TENCR: data.groom,
+        TENCD: data.bride,
+        SDT: data.phone,
+        CA: data.shift,
+        MASANH: data.hall,
+        NGAYDAI: data.date,
+        TIENCOC: data.deposit,
+        SOLUONGBAN: data.tables,
+        SOBANDT: data.reserveTables
+    };
+
+    fetch(`http://localhost:3000/api/tieccuoi/${editData?.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+    })
+    .then((res) => {
+        if (!res.ok) throw new Error("Sửa thất bại");
+        return res.json();
+    })
+    .then(() => {
+        fetchParties(); // load lại data mới nhất
+    })
+    .catch((err) => {
+        console.error("Lỗi khi sửa:", err);
+        alert("Sửa thất bại, vui lòng thử lại.");
+    });
+
+    setIsPartyFormOpen(false);
+    setEditData(null);
+}}
+
+
+
                 onExportBill={(partyData) => {
                     setBillPartyData(partyData);
                     setIsPartyFormOpen(false);
                     setIsBillFormOpen(true);
                 }}
                 initialData={editData}
-                readOnly={false}
+                readOnly={editData ? false : false} 
             />
 
             <BillForm
@@ -458,13 +526,31 @@ export default function PartyPage() {
             />
 
             <ConfirmDelete
-                open={isDeleteConfirmOpen}
-                onClose={() => setIsDeleteConfirmOpen(false)}
-                onConfirm={() => {
-                    // delete logic using deleteId
+            open={isDeleteConfirmOpen}
+            onClose={() => setIsDeleteConfirmOpen(false)}
+            onConfirm={() => {
+                if (!deleteId) return;
+
+                fetch(`http://localhost:3000/api/tieccuoi/${deleteId}`, {
+                    method: 'DELETE',
+                })
+                .then((res) => {
+                    if (!res.ok) throw new Error("Xóa thất bại");
+
+                    // Xóa khỏi state
+                    setParties((prev) => prev.filter(p => p.id !== deleteId));
+                })
+                .catch((err) => {
+                    console.error("Lỗi khi xóa:", err);
+                    alert("Xóa thất bại, vui lòng thử lại.");
+                })
+                .finally(() => {
                     setIsDeleteConfirmOpen(false);
-                }}
-            />
+                    setDeleteId(null);
+                });}}
+
+        />
+
         </Box>
     );
 }

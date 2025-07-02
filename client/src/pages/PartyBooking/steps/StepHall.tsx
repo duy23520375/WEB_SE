@@ -2,105 +2,48 @@ import { Box, Card, CardContent, CardMedia, FormControl, MenuItem, Select, TextF
 import { Controller, useFormContext } from "react-hook-form";
 import { defaultBgColorMap, defaultTextColorMap } from "../../../assets/color/ColorMap";
 import TableRestaurantIcon from '@mui/icons-material/TableRestaurant';
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import SearchBar from "../../../components/SearchBar";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import HallDetailMenu from "../../../components/Menu/HallDetailMenu";
 
-const halls = [
-    {
-        id: "1",
-        name: "Sảnh Hồng",
-        type: "A",
-        maxTable: 30,
-        minTablePrice: 1000000,
-        description: "Không gian mở, view đẹp, thích hợp cho tiệc cưới ngoài trời và các buổi tiệc nhẹ nhàng.",
-        image: 'https://picsum.photos/300/300',
-    },
-    {
-        id: "2",
-        name: "Sảnh Phượng",
-        type: "B",
-        maxTable: 40,
-        minTablePrice: 1100000,
-        description: "Thiết kế hiện đại, ánh sáng tự nhiên, lý tưởng cho các buổi tiệc thân mật và ấm cúng.",
-        image: 'https://picsum.photos/400/300',
-    },
-    {
-        id: "3",
-        name: "Sảnh Mai",
-        type: "E",
-        maxTable: 100,
-        minTablePrice: 1600000,
-        description: "Sảnh VIP, tiện nghi cao cấp, dịch vụ chuyên nghiệp, dành cho các sự kiện đặc biệt.",
-        image: 'https://picsum.photos/500/300',
-    },
-    {
-        id: "4",
-        name: "Sảnh Lan",
-        type: "D",
-        maxTable: 80,
-        minTablePrice: 1400000,
-        description: "Không gian sang trọng, sức chứa lớn, phù hợp cho các buổi tiệc cưới hoành tráng và sự kiện lớn.",
-        image: 'https://picsum.photos/200/400',
-    },
-    {
-        id: "5",
-        name: "Sảnh Cúc",
-        type: "E",
-        maxTable: 90,
-        minTablePrice: 1600000,
-        description: "Thiết kế hiện đại, ánh sáng tự nhiên, lý tưởng cho các buổi tiệc thân mật và ấm cúng.",
-        image: 'https://picsum.photos/200/100',
-    },
-    {
-        id: "6",
-        name: "Sảnh Sen",
-        type: "A",
-        maxTable: 40,
-        minTablePrice: 1000000,
-        description: "Không gian mở, view đẹp, thích hợp cho tiệc cưới ngoài trời và các buổi tiệc nhẹ nhàng.",
-        image: 'https://picsum.photos/200/500',
-    },
-    {
-        id: "7",
-        name: "Sảnh Tùng",
-        type: "B",
-        maxTable: 50,
-        minTablePrice: 1100000,
-        description: "Sảnh VIP, tiện nghi cao cấp, dịch vụ chuyên nghiệp, dành cho các sự kiện đặc biệt.",
-        image: 'https://picsum.photos/250/300',
-    },
-    {
-        id: "8",
-        name: "Sảnh Trúc",
-        type: "C",
-        maxTable: 60,
-        minTablePrice: 1200000,
-        description: "Phong cách cổ điển, trang trí tinh tế, phù hợp cho các buổi tiệc sang trọng và lịch lãm.",
-        image: 'https://picsum.photos/200/350',
-    },
-    {
-        id: "9",
-        name: "Sảnh Đào",
-        type: "D",
-        maxTable: 90,
-        minTablePrice: 1400000,
-        description: "Không gian sang trọng, sức chứa lớn, phù hợp cho các buổi tiệc cưới hoành tráng và sự kiện lớn.",
-        image: 'https://picsum.photos/150/300',
-    },
-    {
-        id: "10",
-        name: "Sảnh Lộc",
-        type: "E",
-        maxTable: 120,
-        minTablePrice: 1600000,
-        description: "Sảnh VIP, tiện nghi cao cấp, dịch vụ chuyên nghiệp, dành cho các sự kiện đặc biệt.",
-        image: 'https://picsum.photos/200/450',
-    }
-];
+// Hàm gán ảnh minh họa dựa vào tên sảnh
+import hallA1Image from "../../../assets/ảnh 1.webp";
+import hallA2Image from "../../../assets/ảnh 2.webp";
+import hallA3Image from "../../../assets/ảnh 3.jpg";
+import hallB1Image from "../../../assets/ảnh 4.jpg";
+import hallB2Image from "../../../assets/ảnh 5.jpg";
+import hallB3Image from "../../../assets/ảnh 6.png";
+import hallC1Image from "../../../assets/ảnh 7.jpg";
+import hallC2Image from "../../../assets/ảnh 8.jpg";
+import hallC3Image from "../../../assets/ảnh 9.jpg";
+import hallD1Image from "../../../assets/ảnh 10.jpg";
+import hallD2Image from "../../../assets/ảnh 11.jpg";
+import hallD3Image from "../../../assets/ảnh 12.jpg";
+import hallE1Image from "../../../assets/ảnh 13.jpg";
+import hallE2Image from "../../../assets/ảnh 14.jpeg";
+import hallE3Image from "../../../assets/ảnh 15.jpg";
+function getHallImage(tenSanh: string) {
+    const ten = tenSanh.toLowerCase();
+    if (ten.includes("grand ballroom a1")) return hallA1Image;
+    if (ten.includes("crystal hall a2")) return hallA2Image;
+    if (ten.includes("diamond suite a3")) return hallA3Image;
+    if (ten.includes("pearl grand b1")) return hallB1Image;
+    if (ten.includes("b2")) return hallB2Image;
+    if (ten.includes("b3")) return hallB3Image;
+    if (ten.includes("c1")) return hallC1Image;
+    if (ten.includes("c2")) return hallC2Image;
+    if (ten.includes("c3")) return hallC3Image;
+    if (ten.includes("d1")) return hallD1Image;
+    if (ten.includes("d2")) return hallD2Image;
+    if (ten.includes("d3")) return hallD3Image;
+    if (ten.includes("e1")) return hallE1Image;
+    if (ten.includes("e2")) return hallE2Image;
+    if (ten.includes("e3")) return hallE3Image;
+    return "https://via.placeholder.com/400x220?text=No+Image";
+}
 
 const NullHall = {
     id: "",
@@ -110,33 +53,54 @@ const NullHall = {
     minTablePrice: 0,
     description: "",
     image: '',
-}
+};
 
 export default function StepHall() {
     const { watch, setValue, control } = useFormContext();
     const [searchKey, setSearchKey] = useState("");
     const [isDetailMenuOpen, setIsDetailMenuOpen] = useState(false);
+    const [halls, setHalls] = useState<any[]>([]);
+
+    // Fetch halls từ backend và gán ảnh minh họa ở FE
+    useEffect(() => {
+        fetch("http://localhost:3000/api/sanh")
+            .then(res => res.json())
+            .then(data => setHalls(data.map((item: any) => ({
+                id: item._id,
+                name: item.TENSANH,
+                type: item.LOAISANH,
+                maxTable: item.SOLUONGBANTD,
+                minTablePrice: item.DONGIABANTT,
+                description: item.GHICHU,
+                image: getHallImage(item.TENSANH),
+            }))));
+    }, []);
 
     const totalTables = (watch("tables") || 0) + (watch("reserveTables") || 0);
     const selectedDate = watch("date");
     const selectedShift = watch("shift");
     const selectedHall = watch("hall") || NullHall;
+    const filterPrice = watch("filterPrice") || 0;
 
+
+    
     const filteredHalls = halls.filter((hall) => {
-        const matchesTables = hall.maxTable >= totalTables;
-        return hall.name.toLowerCase().includes(searchKey.toLowerCase())
-            && matchesTables;
-    })
+    const matchesTables = hall.maxTable >= totalTables;
+    const matchesPrice = hall.minTablePrice >= filterPrice;
+    return hall.name.toLowerCase().includes(searchKey.toLowerCase())
+        && matchesTables
+        && matchesPrice;
+});
 
     return (
         <Box sx={{
             display: 'flex', gap: '20px', height: '100%'
         }}>
-            {totalTables != 0 && selectedDate && selectedShift ?
+            {totalTables !== 0 && selectedDate && selectedShift ?
                 <Box sx={{
                     flex: 1,
                     overflowY: 'auto',
-                    pr: 1, // để tránh che mất scroll bar
+                    pr: 1,
                 }}>
                     <Box sx={{
                         display: 'grid',
@@ -233,7 +197,7 @@ export default function StepHall() {
                                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                             <TableRestaurantIcon sx={{ fontSize: '1rem', mr: 0.5, }} />
                                             <Typography color="text.secondary" fontSize={14}>
-                                                Đơn giá bàn tối thiểu: {hall.minTablePrice.toLocaleString('vi-VN')} VND
+                                                Đơn giá bàn tối thiểu: {hall.minTablePrice?.toLocaleString('vi-VN')} VND
                                             </Typography>
                                         </Box>
                                     </Box>
@@ -297,7 +261,7 @@ export default function StepHall() {
                 />
 
                 <Controller
-                    name="reserveTables"
+                    name="filterPrice"
                     control={control}
                     defaultValue=""
                     render={({ field }) => (
@@ -307,7 +271,7 @@ export default function StepHall() {
                             alignItems: 'center'
                         }}>
                             <Typography sx={{ fontSize: '16px', fontWeight: 'bold' }}>
-                                Số bàn dự trữ:
+                                Đơn giá bàn:
                             </Typography>
                             <TextField
                                 type="number"
@@ -374,10 +338,7 @@ export default function StepHall() {
                                 }}
                             >
                                 {["Trưa", "Tối"].map((item) =>
-                                    <MenuItem value={item}
-                                        sx={{
-                                        }}
-                                    >
+                                    <MenuItem value={item} key={item}>
                                         <Box sx={{
                                             display: 'inline-flex',
                                             paddingX: '7px',

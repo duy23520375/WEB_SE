@@ -4,7 +4,14 @@ const Tieccuoi = require('./../models/Tieccuoi')
 
 router.post('/', async (req, res) => {
   try {
+    // Đếm số lượng tiệc cưới hiện tại
+    const count = await Tieccuoi.countDocuments();
+    // Sinh mã mới, ví dụ: TC01, TC02,...
+    const newMaTiec = `TC${String(count + 1).padStart(2, '0')}`;
+
     const data = req.body;
+    data.MATIEC = newMaTiec; // Gán mã mới vào data gửi xuống DB
+
     const newTieccuoi = new Tieccuoi(data);
     const response = await newTieccuoi.save();
     console.log('Data saved');
@@ -27,6 +34,7 @@ router.get('/', async (req, res) => {
 });
 
 router.put('/:id', async (req,res)=> {
+  console.log("PUT data:", req.body);
   try {
     const tieccuoiId = req.params.id;
     const updatedTieccuoiData = req.body;
