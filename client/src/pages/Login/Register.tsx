@@ -9,10 +9,6 @@ import {
     IconButton,
     InputAdornment,
     Alert,
-    MenuItem, // For dropdown
-    FormControl,
-    InputLabel,
-    Select, // For dropdown
     SelectChangeEvent, // Thêm SelectChangeEvent vào đây
 } from '@mui/material';
 const RegisterPage: React.FC = () => {
@@ -81,10 +77,11 @@ const RegisterPage: React.FC = () => {
                             'Content-Type': 'application/json',
                         },
                         body: JSON.stringify({
-                            fullName: registerData.fullName,
-                            phoneNumber: registerData.phoneNumber,
-                            password: registerData.password,
-                        }),
+                            TenDangNhap: registerData.phoneNumber,  // Đúng với schema
+                            MatKhau: registerData.password,
+                            HoTen: registerData.fullName,
+                            LoaiTK: 'NhanVien' // hoặc cho phép chọn giữa 'Admin' và 'NhanVien'
+                            }),
                     });
 
                     const data = await res.json();
