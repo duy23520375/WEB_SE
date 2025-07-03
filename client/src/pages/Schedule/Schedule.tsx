@@ -6,172 +6,63 @@ import PartyForm from "../../components/Form/PartyForm";
 import WeeklySchedule from "./WeeklySchedule";
 import MonthlySchedule from "./MonthlySchedule";
 import dayjs from "dayjs";
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from "react-router-dom";
 import { LocalizationProvider, StaticDatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-
-const initialData: IParty[] = [
-  {
-    id: 1,
-    groom: "Nguyễn Văn Nam",
-    bride: "Trần Thị Lan",
-    phone: "0912345678",
-    date: "2025-06-15",
-    shift: "Trưa",
-    hall: "A",
-    deposit: 10000000,
-    tables: 1000000,
-    reserveTables: 5,
-    status: "Đã đặt cọc",
-  },
-  {
-    id: 2,
-    groom: "Lê Minh Quân",
-    bride: "Phạm Thị Hạnh",
-    phone: "0934567890",
-    date: "2025-05-11",
-    shift: "Tối",
-    hall: "B",
-    deposit: 15000000,
-    tables: 50,
-    reserveTables: 3,
-    status: "Đã tổ chức",
-  },
-  {
-    id: 3,
-    groom: "Trần Văn Hùng",
-    bride: "Lê Thị Thảo",
-    phone: "0901122334",
-    date: "2025-06-25",
-    shift: "Trưa",
-    hall: "C",
-    deposit: 12000000,
-    tables: 40,
-    reserveTables: 2,
-    status: "Đã huỷ",
-  },
-  {
-    id: 4,
-    groom: "Phan Thanh Tùng",
-    bride: "Nguyễn Thị Mai",
-    phone: "0911223344",
-    date: "2025-07-01",
-    shift: "Tối",
-    hall: "D",
-    deposit: 20000000,
-    tables: 70,
-    reserveTables: 4,
-    status: "Đã đặt cọc",
-  },
-  {
-    id: 5,
-    groom: "Đỗ Văn Lâm",
-    bride: "Trần Thị Ngọc",
-    phone: "0922334455",
-    date: "2025-05-11",
-    shift: "Trưa",
-    hall: "E",
-    deposit: 11000000,
-    tables: 35,
-    reserveTables: 2,
-    status: "Đã đặt cọc",
-  },
-  {
-    id: 6,
-    groom: "Ngô Minh Dũng",
-    bride: "Võ Thị Thu",
-    phone: "0933445566",
-    date: "2025-05-10",
-    shift: "Tối",
-    hall: "A",
-    deposit: 18000000,
-    tables: 65,
-    reserveTables: 5,
-    status: "Đã thanh toán",
-  },
-  {
-    id: 7,
-    groom: "Hoàng Văn Khánh",
-    bride: "Đặng Thị Hương",
-    phone: "0944556677",
-    date: "2025-03-15",
-    shift: "Trưa",
-    hall: "B",
-    deposit: 13000000,
-    tables: 45,
-    reserveTables: 3,
-    status: "Đã tổ chức",
-  },
-  {
-    id: 8,
-    groom: "Vũ Thành Long",
-    bride: "Nguyễn Thị Hồng",
-    phone: "0955667788",
-    date: "2025-03-20",
-    shift: "Tối",
-    hall: "C",
-    deposit: 17000000,
-    tables: 60,
-    reserveTables: 4,
-    status: "Đã tổ chức",
-  },
-  {
-    id: 9,
-    groom: "Phạm Hữu Thắng",
-    bride: "Trần Thị Yến",
-    phone: "0966778899",
-    date: "2025-07-25",
-    shift: "Trưa",
-    hall: "D",
-    deposit: 14000000,
-    tables: 55,
-    reserveTables: 2,
-    status: "Đã đặt cọc",
-  },
-  {
-    id: 10,
-    groom: "Lý Minh Phát",
-    bride: "Huỳnh Thị Linh",
-    phone: "0977889900",
-    date: "2025-07-30",
-    shift: "Tối",
-    hall: "E",
-    deposit: 16000000,
-    tables: 50,
-    reserveTables: 3,
-    status: "Đã thanh toán",
-  },
-  {
-    id: 11,
-    groom: "Trịnh Văn Bình",
-    bride: "Phạm Thị Kim",
-    phone: "0988990011",
-    date: "2025-05-11",
-    shift: "Trưa",
-    hall: "A",
-    deposit: 15500000,
-    tables: 42,
-    reserveTables: 2,
-    status: "Đã thanh toán",
-  },
-  {
-    id: 12,
-    groom: "Tống Văn Sơn",
-    bride: "Đinh Thị Lệ",
-    phone: "0999001122",
-    date: "2025-05-09",
-    shift: "Tối",
-    hall: "B",
-    deposit: 19000000,
-    tables: 70,
-    reserveTables: 5,
-    status: "Đã tổ chức",
-  },
-];
 
 export default function Schedule() {
   const { view } = useParams<{ view: 'tuan' | 'thang' }>();
   const navigate = useNavigate();
+
+
+  const [initialData, setInitialData] = useState<IParty[]>([]);
+// 1. State mới để giữ danh sách halls:
+const [halls, setHalls] = useState<{ _id: string; LOAISANH: string }[]>([]);
+
+// 2. Khi component mount, fetch cả hai cùng lúc:
+useEffect(() => {
+  async function loadAll() {
+    // fetch}sanh và tieccuoi song song
+    const [hRes, pRes] = await Promise.all([
+      fetch("http://localhost:3000/api/sanh"),
+      fetch("http://localhost:3000/api/tieccuoi"),
+    ]);
+    const hallsJson   = await hRes.json() as any[];           // mỗi phần tử có _id, LOAISANH, TENSANH…
+    const partiesJson = await pRes.json() as any[];           // phần tiệc cưới
+    setHalls(hallsJson);
+
+    // 3. Map partiesJson thành IParty, ánh xạ MASANH -> LOAISANH
+    const mapped: IParty[] = partiesJson.map(item => {
+      // tìm hall doc có _id === item.MASANH
+      const hallDoc = hallsJson.find(h => h._id === item.MASANH);
+      return {
+        id:             item._id,
+        groom:          item.TENCR,
+        bride:          item.TENCD,
+        phone:          item.SDT,
+        date:           item.NGAYDAI,
+        shift:          item.CA,
+        // gán hall bằng LOAISANH, hoặc fallback về chính item.MASANH nếu không tìm thấy
+        hall:           hallDoc?.LOAISANH ?? item.MASANH,
+        deposit:        item.TIENCOC,
+        tables:         item.SOLUONGBAN,
+        reserveTables:  item.SOBANDT,
+        status:         item.DAHUY
+                          ? "Đã huỷ"
+                          : item.DATHANHTOAN
+                            ? "Đã thanh toán"
+                            : item.DATOCHUC
+                              ? "Đã tổ chức"
+                              : "Đã đặt cọc",
+      };
+    });
+
+    setInitialData(mapped);
+  }
+  loadAll();
+}, []);
+
+
   const [viewMode, setViewMode] = useState<'tuan' | 'thang'>(view || 'tuan');
   const [currentDate, setCurrentDate] = useState(dayjs());
   const [tempDate, setTempDate] = useState(currentDate);
