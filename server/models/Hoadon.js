@@ -1,10 +1,6 @@
 const mongoose = require('mongoose')
 
 const HoadonSchema = new mongoose.Schema({
-  MAHOADON: {
-    type: String,
-    required: true
-  },
   MATIEC: {
     type: String,
     required: true,
@@ -12,7 +8,7 @@ const HoadonSchema = new mongoose.Schema({
     ref: 'Tieccuoi'
   },
   NGAYTHANHTOAN: {
-    type: Date,
+    type: Date, 
     required: true
   },
   TONGTIEN: {
@@ -20,6 +16,7 @@ const HoadonSchema = new mongoose.Schema({
     required: true,
     min: 0
   }
+  
 })
 
 const Hoadon = mongoose.model('Hoadon', HoadonSchema);

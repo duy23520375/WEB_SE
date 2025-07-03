@@ -44,6 +44,7 @@ export default function PartyForm({
         deposit: 0,
         tables: 0,
         reserveTables: 0,
+        status: "Đã đặt cọc",
     });
 
     useEffect(() => {
@@ -59,6 +60,7 @@ export default function PartyForm({
             deposit: 0,
             tables: 0,
             reserveTables: 0,
+            status: "Đã đặt cọc",
         });
     }, [initialData]);
 
@@ -379,7 +381,7 @@ export default function PartyForm({
                         </Typography>
                         <TextField fullWidth value={form.deposit}
                             placeholder="Nhập tiền cọc"
-                            disabled={readOnly}
+                           disabled={readOnly}
                             onChange={(e) => setForm({ ...form, deposit: Number(e.target.value) })} />
                     </Box>
 
@@ -408,6 +410,45 @@ export default function PartyForm({
                             disabled={readOnly}
                             onChange={(e) => setForm({ ...form, reserveTables: Number(e.target.value) })} />
                     </Box>
+                    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+  <Typography sx={{ fontSize: '14px', fontWeight: 'bold' }}>
+    Trạng thái
+  </Typography>
+  <Select
+    value={form.status}
+    onChange={(e) => setForm({ ...form, status: e.target.value })}
+    disabled={readOnly}
+    sx={{
+      height: '61px',
+      "& .MuiSelect-icon": {
+        color: "var(--text-color)",
+      },
+    }}
+    MenuProps={{
+      PaperProps: {
+        sx: {
+          boxSizing: 'border-box',
+          padding: "0 8px",
+          border: "1px solid #e4e4e7",
+          "& .MuiMenuItem-root": {
+            borderRadius: "6px",
+            "&:hover": {
+              backgroundColor: "rgba(117, 126, 136, 0.08)",
+            },
+            "&.Mui-selected": {
+              backgroundColor: "#bcd7ff",
+            },
+          },
+        },
+      },
+    }}
+  >
+    <MenuItem value="Đã đặt cọc">Đã đặt cọc</MenuItem>
+    <MenuItem value="Đã thanh toán">Đã thanh toán</MenuItem>
+    <MenuItem value="Đã huỷ">Đã huỷ</MenuItem>
+  </Select>
+</Box>
+
                 </Box>
             </DialogContent>
 
@@ -444,7 +485,11 @@ export default function PartyForm({
                     <Button
                         variant="contained"
                         color="success"
-                        onClick={() => onSubmit(form)}
+                        onClick={() => {
+                            console.log("DỮ LIỆU GỬI LÊN:", form); // ✅ thêm dòng này
+
+                            onSubmit(form);
+                        }}
                         sx={{
                             fontSize: "14px",
                             fontWeight: "bold",

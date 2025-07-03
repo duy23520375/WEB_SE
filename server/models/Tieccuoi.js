@@ -44,7 +44,11 @@ const TieccuoiSchema = new mongoose.Schema({
     required: true,
     match: /^\d{10}$/
   },
-
+  TRANGTHAI: {
+    type: String,
+    enum: ["Đã đặt cọc", "Đã thanh toán", "Đã huỷ"],
+    default: "Đã đặt cọc"
+  }
 })
 
 const Tieccuoi = mongoose.model('Tieccuoi', TieccuoiSchema);

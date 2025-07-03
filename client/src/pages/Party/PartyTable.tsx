@@ -371,30 +371,29 @@ export default function PartyTable({
                                 </TableCell>
 
                                 {/* Hall - loại sảnh */}
-                                <TableCell
-                                    align="center"
-                                    sx={{
-                                        width: "5%",
-                                    }}
-                                >
-                                    <Box
-                                        sx={{
-                                            display: 'inline-flex',
-                                            paddingX: 1.5,
-                                            paddingY: 0.5,
-                                            borderRadius: 2,
-                                            fontWeight: 'bold',
-                                            backgroundColor: defaultBgColorMap[party.hall],
-                                            color: defaultTextColorMap[party.hall],
-                                        }}
-                                    >
-                                        {/* Hiển thị loại sảnh thay vì mã sảnh */}
-                                        {(() => {
-                                            const hallObj = halls.find(h => h.MASANH === party.hall);
-                                            return hallObj ? hallObj.LOAISANH : party.hall;
-                                        })()}
-                                    </Box>
-                                </TableCell>
+                                <TableCell align="center" sx={{ width: "5%" }}>
+  {(() => {
+    const hallObj = halls.find(h => h.MASANH === party.hall);
+    const loaiSanh = hallObj ? hallObj.LOAISANH : party.hall;
+
+    return (
+      <Box
+        sx={{
+          display: 'inline-flex',
+          paddingX: 1.5,
+          paddingY: 0.5,
+          borderRadius: 2,
+          fontWeight: 'bold',
+          backgroundColor: defaultBgColorMap[loaiSanh],   // Sửa ở đây
+          color: defaultTextColorMap[loaiSanh],           // Và ở đây
+        }}
+      >
+        {loaiSanh}
+      </Box>
+    );
+  })()}
+</TableCell>
+
 
                                 {/* Deposit */}
                                 <TableCell

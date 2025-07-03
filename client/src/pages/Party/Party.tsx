@@ -35,11 +35,7 @@ export default function PartyPage() {
             .then(res => res.json())
             .then(data => {
     const mapped = data.map((item: any, idx: number) => {
-        let status = "Đã đặt cọc";
-        if (item.DAHUY) status = "Đã huỷ";
-        else if (item.DATHANHTOAN) status = "Đã thanh toán";
-        else if (item.DATOCHUC) status = "Đã tổ chức";
-        // Có thể bổ sung logic khác nếu cần
+        let status = item.TRANGTHAI || "Đã đặt cọc"
         return {
             code: `TC${(idx + 1).toString().padStart(2, "0")}`,
             id: item._id,
@@ -83,10 +79,6 @@ export default function PartyPage() {
         .then(res => res.json())
         .then(data => {
             const mapped = data.map((item: any, idx: number) => {
-                let status = "Đã đặt cọc";
-                if (item.DAHUY) status = "Đã huỷ";
-                else if (item.DATHANHTOAN) status = "Đã thanh toán";
-                else if (item.DATOCHUC) status = "Đã tổ chức";
                 return {
                     code: item.MATIEC,
                     id: item._id,
@@ -99,9 +91,10 @@ export default function PartyPage() {
                     deposit: item.TIENCOC,
                     tables: item.SOLUONGBAN,
                     reserveTables: item.SOBANDT,
-                    status,
+                    status: item.TRANGTHAI || "Đã đặt cọc", // ✅ Lấy đúng từ DB
                 };
             });
+
             setParties(mapped);
         });
 };
@@ -119,7 +112,9 @@ export default function PartyPage() {
 
         const matchesDate = partyDate.isAfter(from.subtract(1, 'day')) && partyDate.isBefore(to.add(1, 'day'));
         const matchesShift = filterShift ? party.shift === filterShift : true;
-        const matchesHall = filterHall ? party.hall === filterHall : true;
+        const matchesHall = filterHall
+            ? (halls.find(h => h.MASANH === party.hall)?.LOAISANH === filterHall)
+            : true;
 
         let matchesSearch = true;
         if (searchKey) {
@@ -483,7 +478,8 @@ export default function PartyPage() {
         NGAYDAI: data.date,
         TIENCOC: data.deposit,
         SOLUONGBAN: data.tables,
-        SOBANDT: data.reserveTables
+        SOBANDT: data.reserveTables,
+        TRANGTHAI: data.status || "Đã đặt cọc"
     };
 
     fetch(`http://localhost:3000/api/tieccuoi/${editData?.id}`, {
