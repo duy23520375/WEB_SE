@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TextField, Button, Box, Typography, Container, Link, FormControlLabel, Checkbox, IconButton, InputAdornment } from '@mui/material';
+import { TextField, Button, Box, Typography, Container, Link, IconButton, InputAdornment } from '@mui/material';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { useNavigate } from 'react-router-dom';
@@ -8,7 +8,6 @@ const LoginPage: React.FC = () => {
     const [phoneNumber, setPhoneNumber] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
-    const [rememberMe, setRememberMe] = useState(false);
     const [phoneError, setPhoneError] = useState('');
     const [passwordError, setPasswordError] = useState('');
     const navigate = useNavigate();
@@ -33,14 +32,41 @@ const LoginPage: React.FC = () => {
         return isValid;
     };
 
-    const handleLogin = () => {
-        if (validateForm()) {
-            console.log('Số điện thoại:', phoneNumber);
-            console.log('Mật khẩu:', password);
-            console.log('Duy trì đăng nhập:', rememberMe);
-            // Logic xử lý đăng nhập sẽ được thêm ở đây sau này
+    const handleLogin = async () => {
+    if (validateForm()) {
+        try {
+            const response = await fetch('http://localhost:3000/api/taikhoan/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    TenDangNhap: phoneNumber,
+                    MatKhau: password
+                })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                console.log('Đăng nhập thành công:', data);
+                // Ví dụ: lưu username và role vào localStorage
+                localStorage.setItem('username', data.username);
+                localStorage.setItem('role', data.role);
+
+                // Điều hướng đến trang chính sau khi đăng nhập
+                navigate('/dashboard');
+            } else {
+                console.error('Lỗi đăng nhập:', data.message);
+                setPasswordError(data.message || 'Sai tài khoản hoặc mật khẩu');
+            }
+        } catch (error) {
+            console.error('Lỗi kết nối máy chủ:', error);
+            setPasswordError('Không thể kết nối tới máy chủ');
         }
-    };
+    }
+};
+
 
     const handleClickShowPassword = () => setShowPassword((show) => !show);
 
@@ -116,27 +142,14 @@ const LoginPage: React.FC = () => {
                     <Box
                         sx={{
                             display: 'flex',
-                            justifyContent: 'space-between',
+                            justifyContent: 'flex-end',
                             width: '100%',
                             mt: 1,
                             mb: 2,
                             alignItems: 'center',
                         }}
                     >
-                        <FormControlLabel
-                            control={(
-                                <Checkbox
-                                    value="remember"
-                                    color="primary"
-                                    checked={rememberMe}
-                                    onChange={(e) => setRememberMe(e.target.checked)}
-                                />
-                            )}
-                            label="Duy trì đăng nhập"
-                        />
-                        <Link href="#" variant="body2" sx={{ color: '#4880FF' }}>
-                            Quên mật khẩu?
-                        </Link>
+                        {/* Đã xóa Duy trì đăng nhập và Quên mật khẩu */}
                     </Box>
                     <Button
                         type="button"
@@ -146,10 +159,9 @@ const LoginPage: React.FC = () => {
                             mt: 1,
                             mb: 2,
                             bgcolor: '#4880FF',
-                            color: '#808080',
+                            color: '#fff',
                             '&:hover': {
-                                bgcolor: '#DCDCDC',
-                                cursor: 'default',
+                                bgcolor: '#3660CC',
                             },
                         }}
                         onClick={handleLogin}

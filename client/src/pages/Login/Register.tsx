@@ -28,7 +28,6 @@ const RegisterPage: React.FC = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [registerError, setRegisterError] = useState('');
 
-    const roles = ['Cô dâu', 'Chú rể', 'Người thân', 'Bạn bè']; // Ví dụ các vai trò
 
     const handleRegisterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<string>) => {
         const { name, value } = e.target;
@@ -67,29 +66,41 @@ const RegisterPage: React.FC = () => {
             setRegisterError('Mật khẩu phải có ít nhất 6 ký tự');
             return false;
         }
-        if (registerData.password !== registerData.confirmPassword) {
-            setRegisterError('Mật khẩu xác nhận không khớp');
-            return false;
-        }
-        if (!registerData.role) {
-            setRegisterError('Vui lòng chọn vai trò');
-            return false;
-        }
-        if (!registerData.weddingDate) {
-            setRegisterError('Vui lòng chọn ngày tổ chức tiệc cưới dự kiến');
-            return false;
-        }
+        
+    
         return true;
     };
 
-    const handleSubmitRegister = () => {
-        setRegisterError('');
-        if (validateRegisterData()) {
-            console.log('Đăng ký với dữ liệu:', registerData);
-            // Logic xử lý đăng ký thực tế (gọi API, lưu DB, v.v.)
-            // Sau khi đăng ký thành công, có thể chuyển hướng về trang đăng nhập
-        }
-    };
+    const handleSubmitRegister = async () => {
+            setRegisterError('');
+            if (validateRegisterData()) {
+                try {
+                    const res = await fetch('http://localhost:3000/api/taikhoan', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            fullName: registerData.fullName,
+                            phoneNumber: registerData.phoneNumber,
+                            password: registerData.password,
+                        }),
+                    });
+
+                    const data = await res.json();
+                    if (!res.ok) {
+                        setRegisterError(data.message || 'Đăng ký thất bại');
+                    } else {
+                        alert('Đăng ký thành công');
+                        window.location.href = '/login'; // hoặc dùng navigate nếu dùng react-router
+                    }
+                } catch (error) {
+                    console.error('Lỗi đăng ký:', error);
+                    setRegisterError('Không thể kết nối đến máy chủ');
+                }
+            }
+        };
+
 
     return (
         <Container component="main" maxWidth="xs">
@@ -156,33 +167,17 @@ const RegisterPage: React.FC = () => {
                             ),
                         }}
                     />
-                    <FormControl fullWidth margin="normal" required>
-                        <InputLabel>Bạn sẽ là? *</InputLabel>
-                        <Select
-                            label="Bạn sẽ là? *"
-                            name="role"
-                            value={registerData.role}
-                            onChange={handleRegisterChange}
-                        >
-                            {roles.map((role) => (
-                                <MenuItem key={role} value={role}>
-                                    {role}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
                     <Button
                         type="button"
                         fullWidth
                         variant="contained"
                         sx={{
-                            mt: 3,
+                            mt: 1,
                             mb: 2,
-                            bgcolor: '#4880FF', // Màu xanh
-                            color: '#808080', // Màu chữ xám đậm
+                            bgcolor: '#4880FF',
+                            color: '#fff',
                             '&:hover': {
-                                bgcolor: '#DCDCDC',
-                                cursor: 'default',
+                                bgcolor: '#3660CC',
                             },
                         }}
                         onClick={handleSubmitRegister}

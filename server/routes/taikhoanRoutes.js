@@ -61,4 +61,26 @@ router.delete('/:id', async (req,res)=> {
   }
 })
 
+// Đăng nhập: kiểm tra tên đăng nhập và mật khẩu
+router.post('/login', async (req, res) => {
+  const { TenDangNhap, MatKhau } = req.body;
+
+  try {
+    const user = await Taikhoan.findOne({ TenDangNhap, MatKhau });
+
+    if (!user) {
+      return res.status(401).json({ message: 'Sai tên đăng nhập hoặc mật khẩu' });
+    }
+
+    return res.status(200).json({
+      username: user.TenDangNhap,
+      role: user.LoaiTK
+    });
+  } catch (error) {
+    console.error('Lỗi đăng nhập:', error);
+    res.status(500).json({ message: 'Lỗi server' });
+  }
+});
+
+
 module.exports = router
