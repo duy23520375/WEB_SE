@@ -1,0 +1,43 @@
+body {
+    overflow-x: hidden;
+}
+
+.petal-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 0; /* Ensure it's behind the content */
+}
+
+.petal {
+    position: absolute;
+    top: -20px; /* Start above the screen */
+    width: 15px;
+    height: 15px;
+    background-color: rgba(255, 182, 193, 0.7); /* Light pink petals */
+    border-radius: 50% 0;
+    opacity: 0;
+    animation: fall linear infinite;
+}
+
+.petal:nth-child(2) { background-color: rgba(255, 250, 250, 0.8); } /* Snow white */
+.petal:nth-child(3) { background-color: rgba(255, 192, 203, 0.7); } /* Pink */
+.petal:nth-child(4) { background-color: rgba(240, 128, 128, 0.6); } /* Light Coral */
+.petal:nth-child(5) { background-color: rgba(255, 228, 225, 0.8); } /* Misty Rose */
+.petal:nth-child(6) { background-color: rgba(255, 240, 245, 0.7); } /* Lavender Blush */
+
+
+@keyframes fall {
+    0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(105vh) rotate(720deg);
+        opacity: 0;
+    }
+} 
