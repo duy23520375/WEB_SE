@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Service as ServiceType } from './serviceData';
 import './Service.css';
+// import { IService } from '../../interfaces/service.interface';
 import { Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, FormControl, InputLabel, Select, MenuItem, Box } from '@mui/material';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import EditIcon from '@mui/icons-material/Edit';
@@ -8,6 +9,8 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import ServiceAddDialog from './ServiceAddDialog.tsx';
 import ServiceEditDialog from './ServiceEditDialog.tsx';
 import ConfirmDelete from '../../components/Alert/ConfirmDelete/ConfirmDelete';
+import ServiceDetailMenu from '../../components/Menu/ServiceDetailMenu';
+import PetalAnimation from '../../components/Animations/PetalAnimation';
 function getServiceImage(service: ServiceType) {
     const ten = service.name ? service.name.toLowerCase() : '';
     if (ten.includes('trang trí sảnh tiệc')) return 'https://nhahanghuonglieusunflower.com/wp-content/uploads/2023/06/Trang-tri-sanh-tiec-cuoi-1.jpg';
@@ -38,9 +41,21 @@ export default function Service() {
     const [openEditServiceDialog, setOpenEditServiceDialog] = useState<boolean>(false);
     const [serviceToEdit, setServiceToEdit] = useState<ServiceType | null>(null);
     const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
+    const [selectedService, setSelectedService] = useState<IService | null>(null);
+    const [detailDialogOpen, setDetailDialogOpen] = useState(false);
     const [serviceToDelete, setServiceToDelete] = useState<ServiceType | null>(null);
     const categories = ['Tất cả', 'Trang Trí', 'MC & Ca Sĩ', 'Quay Chụp', 'Làm Đẹp', 'Trang Phục', 'Phương Tiện', 'Thiệp & Quà', 'Bánh & Rượu', 'An Ninh'];
     const [services, setServices] = useState<ServiceType[]>([]);
+    const handleServiceClick = (service: IService) => {
+        setSelectedService(service);
+        setDetailDialogOpen(true);
+    };
+
+    const handleCloseDetailDialog = () => {
+        setDetailDialogOpen(false);
+        setSelectedService(null);
+    };
+
     useEffect(() => {
         fetch('http://localhost:3000/api/dichvu')
             .then(res => res.json())
@@ -52,6 +67,7 @@ export default function Service() {
                     description: item.GHICHU,
                     price: item.DONGIA,
                     category: item.DANHMUC,
+                    image:      getServiceImage({ name: item.TENDICHVU }),
                 }));
                 setServices(mapped);
             });
@@ -153,6 +169,7 @@ export default function Service() {
 
     return (
         <div className="service-container">
+            <PetalAnimation />
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                 <h2>Dịch Vụ Đám Cưới</h2>
                 <Button
@@ -197,7 +214,13 @@ export default function Service() {
                         minWidth: '240px',
                         maxWidth: '1fr',
                         position: 'relative',
-                    }}>
+                        cursor: 'pointer', 
+                    }}
+
+                    onClick={() => handleServiceClick(service)}
+
+
+                    >
                         <div style={{
                             position: 'absolute',
                             top: 8,
@@ -206,7 +229,11 @@ export default function Service() {
                             gap: 8,
                             zIndex: 2
                         }}>
-                            <Button size="small" sx={{ minWidth: 0, p: 0.5 }} onClick={() => handleEditClick(service)}>
+                            <Button size="small" sx={{ minWidth: 0, p: 0.5 }}   
+                            onClick={(e) => {
+                                            e.stopPropagation();       
+                                            handleEditClick(service);
+                                        }}>
                                 <Box
                                     sx={{
                                         bgcolor: '#fff',
@@ -228,7 +255,11 @@ export default function Service() {
                                     <EditIcon fontSize="small" sx={{ color: '#00e1ff', opacity: 0.85, transition: 'opacity 0.2s' }} />
                                 </Box>
                             </Button>
-                            <Button size="small" sx={{ minWidth: 0, p: 0.5 }} onClick={() => handleDeleteClick(service)}>
+                            <Button size="small" sx={{ minWidth: 0, p: 0.5 }}   
+                            onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    handleDeleteClick(service);
+                                                                }}>
                                 <Box
                                     sx={{
                                         bgcolor: '#fff',
@@ -251,7 +282,7 @@ export default function Service() {
                                 </Box>
                             </Button>
                         </div>
-                        <img src={getServiceImage(service)} alt={service.name} className="service-image" />                        <div className="service-info">
+                        <img src={service.image}  alt={service.name} className="service-image" />                        <div className="service-info">
                             <h3>{service.name}</h3>
                             <p>{service.description}</p>
                             <p className="service-price">{service.price.toLocaleString('vi-VN')} VNĐ</p>
@@ -278,6 +309,13 @@ export default function Service() {
                 onClose={handleCloseDeleteDialog}
                 onConfirm={handleConfirmDelete}
             />
+            {selectedService && (
+                <ServiceDetailMenu
+                    open={detailDialogOpen}
+                    onClose={handleCloseDetailDialog}
+                    initialData={selectedService}
+                />
+            )}
         </div>
     );
 }
