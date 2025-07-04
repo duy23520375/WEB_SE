@@ -29,10 +29,14 @@ useEffect(() => {
     ]);
     const hallsJson   = await hRes.json() as any[];           // mỗi phần tử có _id, LOAISANH, TENSANH…
     const partiesJson = await pRes.json() as any[];           // phần tiệc cưới
+
+    const filtered = partiesJson.filter(item => item.TRANGTHAI !== 'Đã huỷ');
+
+
     setHalls(hallsJson);
 
     // 3. Map partiesJson thành IParty, ánh xạ MASANH -> LOAISANH
-    const mapped: IParty[] = partiesJson.map(item => {
+    const mapped: IParty[] = filtered.map(item => {
       // tìm hall doc có _id === item.MASANH
       const hallDoc = hallsJson.find(h => h._id === item.MASANH);
       return {
@@ -47,13 +51,7 @@ useEffect(() => {
         deposit:        item.TIENCOC,
         tables:         item.SOLUONGBAN,
         reserveTables:  item.SOBANDT,
-        status:         item.DAHUY
-                          ? "Đã huỷ"
-                          : item.DATHANHTOAN
-                            ? "Đã thanh toán"
-                            : item.DATOCHUC
-                              ? "Đã tổ chức"
-                              : "Đã đặt cọc",
+        status:         item.TRANGTHAI
       };
     });
 
