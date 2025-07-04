@@ -15,6 +15,7 @@ import {
     Button,
     InputAdornment,
 } from "@mui/material";
+import PetalAnimation from '../../components/Animations/PetalAnimation';
 import TableRestaurantIcon from '@mui/icons-material/TableRestaurant';
 import SearchIcon from '@mui/icons-material/Search';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
@@ -190,6 +191,7 @@ export default function HallPage() {
             padding: '20px',
             boxSizing: 'border-box',
         }}>
+            <PetalAnimation />
             <Typography
                 sx={{
                     userSelect: "none",
