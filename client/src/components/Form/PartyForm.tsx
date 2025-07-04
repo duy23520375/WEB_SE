@@ -469,7 +469,7 @@ export default function PartyForm({
                     >
                         Huỷ
                     </Button>
-                    <Button
+                    {/* <Button
                         variant="contained"
                         onClick={() => onExportBill?.(form)}
                         sx={{
@@ -481,7 +481,7 @@ export default function PartyForm({
                         }}
                     >
                         Xuất hóa đơn
-                    </Button>
+                    </Button> */}
                     <Button
                         variant="contained"
                         color="success"
