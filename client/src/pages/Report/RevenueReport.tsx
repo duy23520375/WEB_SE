@@ -21,12 +21,12 @@ export default function RevenueReport() {
     async function loadReport() {
       try {
         // lấy về tất cả tiệc
-        const res = await fetch("http://localhost:3000/api/tieccuoi");
+        const res = await fetch("http://localhost:3000/api/hoadon");
         const raw: any[] = await res.json();
 
         // filter theo month + year
         const filtered = raw.filter((item) => {
-          const d = dayjs(item.NGAYDAI);
+          const d = dayjs(item.NGAYTHANHTOAN);
           return (
             d.month() + 1 === selectedMonth && d.year() === selectedYear
           );
@@ -36,10 +36,10 @@ export default function RevenueReport() {
         const groups: Record<number, { eventCount: number; revenue: number }> =
           {};
         filtered.forEach((item) => {
-          const day = dayjs(item.NGAYDAI).date();
+          const day = dayjs(item.NGAYTHANHTOAN).date();
           if (!groups[day]) groups[day] = { eventCount: 0, revenue: 0 };
           groups[day].eventCount += 1;
-          groups[day].revenue += item.TIENCOC*10;
+          groups[day].revenue += item.TONGTIEN;
         });
 
         // build mảng đủ ngày trong tháng
