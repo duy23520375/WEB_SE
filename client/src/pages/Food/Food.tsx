@@ -93,10 +93,11 @@ export default function Food() {
         })
         .catch(err => console.error(err));
 }, []);
-    const filteredFoods = selectedCategory === 'Tất cả'
-    ? foods
-    : foods.filter(food => food.category === selectedCategory);
-    
+    const filteredFoods = foods.filter(food => {
+        const matchesCategory = selectedCategory === 'Tất cả' || food.category === selectedCategory;
+        const matchesSearch = food.name.toLowerCase().includes(searchKey.toLowerCase());
+        return matchesCategory && matchesSearch;
+    });
     const handleCloseDialog = () => {
         setOpenDialog(false);
         setNewFood({
