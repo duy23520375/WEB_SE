@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Service as ServiceType } from './serviceData';
 import './Service.css';
 // import { IService } from '../../interfaces/service.interface';
-import { Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, FormControl, InputLabel, Select, MenuItem, Box } from '@mui/material';
+import { Button, Dialog,Typography, DialogTitle, DialogContent, DialogActions, TextField, FormControl, InputLabel, Select, MenuItem, Box } from '@mui/material';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -11,6 +11,7 @@ import ServiceEditDialog from './ServiceEditDialog.tsx';
 import ConfirmDelete from '../../components/Alert/ConfirmDelete/ConfirmDelete';
 import ServiceDetailMenu from '../../components/Menu/ServiceDetailMenu';
 import PetalAnimation from '../../components/Animations/PetalAnimation';
+import SearchBar from '../../components/SearchBar';
 function getServiceImage(service: ServiceType) {
     const ten = service.name ? service.name.toLowerCase() : '';
     if (ten.includes('trang trí sảnh tiệc')) return 'https://nhahanghuonglieusunflower.com/wp-content/uploads/2023/06/Trang-tri-sanh-tiec-cuoi-1.jpg';
@@ -36,6 +37,12 @@ function getServiceImage(service: ServiceType) {
     return '/images/service-default.jpg';
 }
 export default function Service() {
+    useEffect(() => {
+        document.body.style.overflow = 'hidden';
+        return () => {
+            document.body.style.overflow = '';
+        };
+    }, []);
     const [selectedCategory, setSelectedCategory] = useState<string>('Tất cả');
     const [openAddServiceDialog, setOpenAddServiceDialog] = useState<boolean>(false);
     const [openEditServiceDialog, setOpenEditServiceDialog] = useState<boolean>(false);
@@ -44,6 +51,7 @@ export default function Service() {
     const [selectedService, setSelectedService] = useState<IService | null>(null);
     const [detailDialogOpen, setDetailDialogOpen] = useState(false);
     const [serviceToDelete, setServiceToDelete] = useState<ServiceType | null>(null);
+    const [searchKey, setSearchKey] = useState("");
     const categories = ['Tất cả', 'Trang Trí', 'MC & Ca Sĩ', 'Quay Chụp', 'Làm Đẹp', 'Trang Phục', 'Phương Tiện', 'Thiệp & Quà', 'Bánh & Rượu', 'An Ninh'];
     const [services, setServices] = useState<ServiceType[]>([]);
     const handleServiceClick = (service: IService) => {
@@ -168,10 +176,37 @@ export default function Service() {
 };
 
     return (
+        <Box sx={{ background: '#f5f6fa', minHeight: '100vh', p: 0, position: 'relative', overflow: 'hidden' }}>
+
+            <Box sx={{ background: 'rgba(255, 255, 255, 0.5)', backdropFilter: 'blur(2px)', borderRadius: 3, p: 3, boxShadow: '0 4px 24px rgba(0,0,0,0.04)', maxWidth: 1400, mx: 'auto', width: '100%', position: 'relative', zIndex: 1 }}>
+                <Box sx={{ height: '100vh', overflowY: 'auto', pr: 2 }}>
         <div className="service-container">
             <PetalAnimation />
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                <h2>Dịch Vụ Đám Cưới</h2>
+                    <Typography
+                        sx={{
+                            userSelect: "none",
+                            color: "var(--text-color)",
+                            fontWeight: "bold",
+                            fontSize: "32px",
+                            marginBottom: "20px",
+                            textAlign: 'left',
+                        }}
+                    >
+                        Dịch Vụ Đám Cưới
+                    </Typography>
+                                        <Box sx={{ display: 'flex', gap: 2, marginBottom: '20px', alignItems: 'center', justifyContent: 'flex-end' }}>
+                        <SearchBar
+                            value={searchKey}
+                            onChange={e => setSearchKey(e.target.value)}
+                            sx={{
+                                height: '48px',
+                                '& .MuiInputBase-root': {
+                                    height: '48px',
+                                    fontSize: '15px',
+                                    borderRadius: '10px',
+                                },
+                            }}
+                        />
                 <Button
                     variant="contained"
                     startIcon={<AddCircleOutlineIcon />}
@@ -188,7 +223,8 @@ export default function Service() {
                 >
                     Thêm dịch vụ
                 </Button>
-            </div>
+                </Box>
+
             
             <div className="category-filter">
                 {categories.map(category => (
@@ -317,5 +353,8 @@ export default function Service() {
                 />
             )}
         </div>
+                </Box>
+            </Box>
+        </Box>
     );
 }
