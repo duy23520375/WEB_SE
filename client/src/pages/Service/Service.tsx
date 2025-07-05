@@ -54,6 +54,12 @@ export default function Service() {
     const [searchKey, setSearchKey] = useState("");
     const categories = ['Tất cả', 'Trang Trí', 'MC & Ca Sĩ', 'Quay Chụp', 'Làm Đẹp', 'Trang Phục', 'Phương Tiện', 'Thiệp & Quà', 'Bánh & Rượu', 'An Ninh'];
     const [services, setServices] = useState<ServiceType[]>([]);
+
+    const filteredServices = services.filter(service => {
+        const matchesCategory = selectedCategory === 'Tất cả' || service.category === selectedCategory;
+        const matchesSearch = service.name.toLowerCase().includes(searchKey.toLowerCase());
+        return matchesCategory && matchesSearch;
+    });
     const handleServiceClick = (service: IService) => {
         setSelectedService(service);
         setDetailDialogOpen(true);
@@ -80,9 +86,6 @@ export default function Service() {
                 setServices(mapped);
             });
     }, []);
-    const filteredServices = selectedCategory === 'Tất cả'
-    ? services
-    : services.filter(service => service.category === selectedCategory);
 
     const handleOpenAddServiceDialog = () => {
         setOpenAddServiceDialog(true);
