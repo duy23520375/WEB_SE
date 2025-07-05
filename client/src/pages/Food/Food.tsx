@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import {  Food as FoodType } from './foodData';
 import './Food.css';
-import { Button, Box } from '@mui/material';
+import { Button, Box, Typography } from '@mui/material';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import DeleteOutline from '@mui/icons-material/DeleteOutline';
 import FoodAddDialog from './FoodAddDialog.tsx';
@@ -10,8 +10,15 @@ import EditIcon from '@mui/icons-material/Edit';
 import FoodEditDialog from './FoodEditDialog.tsx';
 import PetalAnimation from '../../components/Animations/PetalAnimation';
 import FoodDetailMenu from '../../components/Menu/FoodDetailMenu';
+import SearchBar from '../../components/SearchBar';
 
 export default function Food() {
+    useEffect(() => {
+        document.body.style.overflow = 'hidden';
+        return () => {
+            document.body.style.overflow = '';
+        };
+    }, []);
     const [selectedCategory, setSelectedCategory] = useState<string>('Tất cả');
     const [openDialog, setOpenDialog] = useState(false);
     const [newFood, setNewFood] = useState({
@@ -30,6 +37,7 @@ export default function Food() {
      const [detailDialogOpen, setDetailDialogOpen] = useState(false);
     const [foodToEdit, setFoodToEdit] = useState<FoodType | null>(null);
     const [foods, setFoods] = useState<FoodType[]>([]);
+    const [searchKey, setSearchKey] = useState("");
     
     useEffect(() => {
     fetch('http://localhost:3000/api/monan')
@@ -228,10 +236,37 @@ export default function Food() {
 
 
     return (
+        <Box sx={{ background: '#f5f6fa', minHeight: '100vh', p: 0, position: 'relative', overflow: 'hidden' }}>
+
+            <Box sx={{ background: '#fff', borderRadius: 3, p: 3, boxShadow: '0 4px 24px rgba(0,0,0,0.04)', maxWidth: 1400, mx: 'auto', width: '100%', position: 'relative', zIndex: 1 }}>
+                <Box sx={{ height: '100vh', overflowY: 'auto', pr: 2 }}> 
         <div className="food-container">
             <PetalAnimation />
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                <h2>Danh Sách Món Ăn</h2>
+                        <Typography
+                            sx={{
+                                userSelect: "none",
+                                color: "var(--text-color)",
+                                fontWeight: "bold",
+                                fontSize: "32px",
+                                marginBottom: "20px",
+                                textAlign: 'left',
+                            }}
+                        >
+                            Danh Sách Món Ăn
+                        </Typography>
+                <Box sx={{ display: 'flex', gap: 2, marginBottom: '20px', alignItems: 'center', justifyContent: 'flex-end' }}>
+                           <SearchBar
+                                value={searchKey}
+                                onChange={e => setSearchKey(e.target.value)}
+                                sx={{
+                                    height: '48px',
+                                    '& .MuiInputBase-root': {
+                                        height: '48px',
+                                        fontSize: '15px',
+                                        borderRadius: '10px',
+                                    },
+                                }}
+                            />
                 <Button
                     variant="contained"
                     startIcon={<AddCircleOutlineIcon />}
@@ -245,7 +280,9 @@ export default function Food() {
                 >
                     Thêm món ăn
                 </Button>
-            </div>
+                </Box>
+            
+            
             
             <div className="category-filter">
                 {categories.map(category => (
@@ -377,5 +414,8 @@ export default function Food() {
                 />
             )}
         </div>
+                </Box>
+            </Box>
+        </Box>
     );
 }
