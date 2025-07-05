@@ -21,7 +21,7 @@ export default function Food() {
         category: '',
         image: null as File | null,
     });
-    const categories = ['Tất cả', 'Món Khai Vị', 'Món Chính', 'Món Súp', 'Món Xào', 'Món Cơm', 'Món Ăn Kèm', 'Món Tráng Miệng'];
+    const categories = ['Tất cả', 'Món Khai Vị', 'Món Chính',   'Món Tráng Miệng'];
     const [addDialogOpen, setAddDialogOpen] = useState(false);
     const [selectedFood, setSelectedFood] = useState<IFood | null>(null);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
