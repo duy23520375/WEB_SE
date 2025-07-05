@@ -111,6 +111,15 @@ export default function HallPage() {
         hall.TENSANH.toLowerCase().includes(searchQuery.toLowerCase()) &&
         (selectedType === 'all' || hall.LOAISANH === selectedType)
     );
+
+        useEffect(() => {
+            document.body.style.overflow = 'hidden';
+            return () => {
+                document.body.style.overflow = '';
+            };
+        }, []);
+
+        
     const handleUpdateHall = async (updatedHall: IHallInfo) => {
     // Gọi API cập nhật
     await fetch(`http://localhost:3000/api/sanh/${updatedHall.MASANH}`, {
