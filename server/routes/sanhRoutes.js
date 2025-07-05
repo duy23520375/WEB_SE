@@ -18,12 +18,7 @@ router.post('/', async (req, res) => {
 router.get('/', async (req, res) => {
   try {
     const data = await Sanh.find();
-    // Gán MASANH = _id cho mỗi sảnh
-    const mapped = data.map(hall => ({
-      ...hall.toObject(),
-      MASANH: hall._id
-    }));
-    res.status(200).json(mapped);
+    res.status(200).json(data);
   } catch (err) {
     console.log(err);
     res.status(500).json({ error: 'Internal Server Error', details: err.message });

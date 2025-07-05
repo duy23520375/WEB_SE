@@ -58,7 +58,7 @@ const imageMap: Record<string, string> = {
     "ảnh 15.jpg": hallE3Image,
 };
 interface IHallInfo {
-    MASANH: string;
+    _id: string;
     TENSANH: string;
     LOAISANH: string;
     SOLUONGBANTD: number;
@@ -111,18 +111,9 @@ export default function HallPage() {
         hall.TENSANH.toLowerCase().includes(searchQuery.toLowerCase()) &&
         (selectedType === 'all' || hall.LOAISANH === selectedType)
     );
-
-        useEffect(() => {
-            document.body.style.overflow = 'hidden';
-            return () => {
-                document.body.style.overflow = '';
-            };
-        }, []);
-
-        
     const handleUpdateHall = async (updatedHall: IHallInfo) => {
     // Gọi API cập nhật
-    await fetch(`http://localhost:3000/api/sanh/${updatedHall.MASANH}`, {
+    await fetch(`http://localhost:3000/api/sanh/${updatedHall._id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updatedHall),
@@ -132,8 +123,8 @@ export default function HallPage() {
     const data = await res.json();
     setHalls(data);
 };
-    const handleHallClick = (masanh: string) => {
-        setSelectedHall(masanh);
+    const handleHallClick = (_id: string) => {
+        setSelectedHall(_id);
     };
 
     const handleCloseDialog = () => {
@@ -148,8 +139,8 @@ export default function HallPage() {
         setOpenAddHallDialog(false);
     };
 
-    const handleDeleteClick = (masanh: string) => {
-        setHallToDelete(masanh);
+    const handleDeleteClick = (_id: string) => {
+        setHallToDelete(_id);
         setOpenConfirmDelete(true);
     };
 
@@ -166,8 +157,8 @@ export default function HallPage() {
         setSelectedType(event.target.value);
     };
 
-    const handleEditClick = (masanh: string) => {
-        const hall = halls.find(h => h.MASANH === masanh);
+    const handleEditClick = (_id: string) => {
+        const hall = halls.find(h => h._id === _id);
         setHallToEdit(hall || null);
         setOpenEditHallDialog(true);
     };
@@ -183,7 +174,7 @@ export default function HallPage() {
             method: "DELETE",
         });
         // Cập nhật lại state halls
-        setHalls(prev => prev.filter(hall => hall.MASANH !== hallToDelete));
+        setHalls(prev => prev.filter(hall => hall._id !== hallToDelete));
         setOpenConfirmDelete(false);
         setHallToDelete(null);
     };
@@ -274,7 +265,7 @@ export default function HallPage() {
             }}>
                 {filteredHalls.map((hall) => (
                     <Card
-                        key={hall.MASANH}
+                        key={hall._id}
                         sx={{
                             width: '100%',
                             display: 'flex',
@@ -287,7 +278,7 @@ export default function HallPage() {
                             },
                             position: 'relative',
                         }}
-                        onClick={() => handleHallClick(hall.MASANH)}
+                        onClick={() => handleHallClick(hall._id)}
                     >
                         <Box sx={{
                             position: 'absolute',
@@ -297,12 +288,12 @@ export default function HallPage() {
                             gap: 1,
                             zIndex: 2,
                         }} onClick={e => e.stopPropagation()}>
-                            <Button size="small" sx={{ minWidth: 0, p: 0.5 }} onClick={() => handleEditClick(hall.MASANH)}>
+                            <Button size="small" sx={{ minWidth: 0, p: 0.5 }} onClick={() => handleEditClick(hall._id)}>
                                 <Box>
                                     <EditIcon fontSize="small" sx={{ color: '#00e1ff', opacity: 0.85, transition: 'opacity 0.2s' }} />
                                 </Box>
                             </Button>
-                            <Button size="small" sx={{ minWidth: 0, p: 0.5 }} onClick={() => handleDeleteClick(hall.MASANH)}>
+                            <Button size="small" sx={{ minWidth: 0, p: 0.5 }} onClick={() => handleDeleteClick(hall._id)}>
                                 <Box>
                                     <DeleteIcon fontSize="small" sx={{ color: '#ff0000', opacity: 0.85, transition: 'opacity 0.2s' }} />
                                 </Box>
@@ -367,7 +358,7 @@ export default function HallPage() {
                 }}
             >
                 {selectedHall && (() => {
-                    const hallDetails = halls.find(h => h.MASANH === selectedHall);
+                    const hallDetails = halls.find(h => h._id === selectedHall);
                     if (!hallDetails) return null;
                     return (
                         <Box>

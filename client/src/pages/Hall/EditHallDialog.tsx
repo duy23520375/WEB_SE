@@ -2,7 +2,7 @@ import React from 'react';
 import { Dialog, DialogTitle, DialogContent, TextField, FormControl, InputLabel, Select, MenuItem, Button, Box } from '@mui/material';
 
 interface IHallInfo {
-    MASANH: string;
+    _id: string,
     TENSANH: string;
     LOAISANH: string;
     SOLUONGBANTD: number;
@@ -44,7 +44,7 @@ const EditHallDialog: React.FC<EditHallDialogProps> = ({ open, onClose, hall, ha
             DONGIABANTT: Number(price),
             GHICHU: note,
         };
-        await fetch(`http://localhost:3000/api/sanh/${hall.MASANH}`, {
+        await fetch(`http://localhost:3000/api/sanh/${hall._id}`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(updatedHall),

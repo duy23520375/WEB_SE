@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Taikhoan = require('./../models/Taikhoan')
+const bcrypt = require('bcrypt'); 
 
 router.post('/', async (req, res) => {
   try {
@@ -61,14 +62,20 @@ router.delete('/:id', async (req,res)=> {
   }
 })
 
-// Đăng nhập: kiểm tra tên đăng nhập và mật khẩu
+
+// Đăng nhập: kiểm tra tên đăng nhập và mật khẩu đã hash
 router.post('/login', async (req, res) => {
   const { TenDangNhap, MatKhau } = req.body;
 
   try {
-    const user = await Taikhoan.findOne({ TenDangNhap, MatKhau });
+    const user = await Taikhoan.findOne({ TenDangNhap });
 
     if (!user) {
+      return res.status(401).json({ message: 'Sai tên đăng nhập hoặc mật khẩu' });
+    }
+
+    const isMatch = await bcrypt.compare(MatKhau, user.MatKhau);
+    if (!isMatch) {
       return res.status(401).json({ message: 'Sai tên đăng nhập hoặc mật khẩu' });
     }
 
@@ -81,6 +88,7 @@ router.post('/login', async (req, res) => {
     res.status(500).json({ message: 'Lỗi server' });
   }
 });
+
 
 
 module.exports = router

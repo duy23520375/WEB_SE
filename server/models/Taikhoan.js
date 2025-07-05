@@ -1,4 +1,5 @@
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
 
 const TaikhoanSchema = new mongoose.Schema({
   TenDangNhap: {
@@ -19,7 +20,19 @@ const TaikhoanSchema = new mongoose.Schema({
     required: true,
     enum: ['Admin', 'NhanVien']
   }
-})
+});
+
+// Hash mật khẩu trước khi lưu
+TaikhoanSchema.pre('save', async function (next) {
+  if (!this.isModified('MatKhau')) return next(); // chỉ hash nếu password bị thay đổi
+  try {
+    const salt = await bcrypt.genSalt(10);
+    this.MatKhau = await bcrypt.hash(this.MatKhau, salt);
+    next();
+  } catch (err) {
+    next(err);
+  }
+});
 
 const Taikhoan = mongoose.model('Taikhoan', TaikhoanSchema);
 module.exports = Taikhoan;

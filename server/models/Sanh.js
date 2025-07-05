@@ -1,10 +1,6 @@
 const mongoose = require('mongoose')
 
 const SanhSchema = new mongoose.Schema({
-  MASANH: {
-    type: String,
-    required: true
-  },
   TENSANH: {
     type: String,
     require: true,

@@ -1,7 +1,7 @@
 // Đã chuyển sang src/pages/Hall/hall.interface.ts
 
 export interface IHall {
-    id: string;
+    _id: string;
     name: string;
     type: string;
     maxTable: number;

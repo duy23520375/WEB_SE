@@ -373,8 +373,14 @@ export default function PartyTable({
                                 {/* Hall - loại sảnh */}
                                 <TableCell align="center" sx={{ width: "5%" }}>
   {(() => {
-    const hallObj = halls.find(h => h.MASANH === party.hall);
+    const hallObj = halls.find(h => String(h._id) === String(party.hall));
     const loaiSanh = hallObj ? hallObj.LOAISANH : party.hall;
+    console.log("hallObj:", hallObj);
+    console.log("party.hall:", party.hall);
+    console.log("Danh sách halls:", halls);
+    console.log("hallObj tìm được:", hallObj);
+    console.log("LOAISANH:", hallObj?.LOAISANH);
+    console.log("Các _id của halls:", halls.map(h => h._id));
 
     return (
       <Box

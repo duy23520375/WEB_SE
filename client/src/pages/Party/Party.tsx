@@ -113,7 +113,7 @@ export default function PartyPage() {
         const matchesDate = partyDate.isAfter(from.subtract(1, 'day')) && partyDate.isBefore(to.add(1, 'day'));
         const matchesShift = filterShift ? party.shift === filterShift : true;
         const matchesHall = filterHall
-            ? (halls.find(h => h.MASANH === party.hall)?.LOAISANH === filterHall)
+            ? (halls.find(h => h._id === party.hall)?.LOAISANH === filterHall)
             : true;
 
         let matchesSearch = true;
@@ -474,7 +474,7 @@ export default function PartyPage() {
         TENCD: data.bride,
         SDT: data.phone,
         CA: data.shift,
-        MASANH: data.hall,
+        _id: data.hall,
         NGAYDAI: data.date,
         TIENCOC: data.deposit,
         SOLUONGBAN: data.tables,

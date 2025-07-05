@@ -26,7 +26,6 @@ const AddHallDialog: React.FC<AddHallDialogProps> = ({ open, onClose, hallTypes,
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
-                    MASANH: Date.now().toString(),
                     TENSANH: name,
                     LOAISANH: type,
                     SOLUONGBANTD: Number(maxTables),
