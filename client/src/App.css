@@ -3,20 +3,14 @@
   display: flex;
 }
 
-.appContainer.homepage-layout {
-  justify-content: center; /* Center content when sidebar is hidden */
-}
-
-.appContainer.homepage-layout .content {
-  flex: none; /* Override flex: 1 when homepage-layout is active */
-  width: 100%; /* Ensure it takes full width */
-  max-width: 1200px; /* Optional: limit max width for better readability */
-  margin: auto; /* Center the content box */
-}
-
 .content {
   flex: 1;
   height: 100%;
   padding: 15px;
   background-color: #F5F6FA;
+}
+
+.fullScreenContainer {
+  height: 100vh;
+  display: flex;
 }

@@ -3,6 +3,7 @@ import { TextField, Button, Box, Typography, Container, Link, IconButton, InputA
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../auth/AuthContext';
 
 const LoginPage: React.FC = () => {
     const [phoneNumber, setPhoneNumber] = useState('');
@@ -11,6 +12,7 @@ const LoginPage: React.FC = () => {
     const [phoneError, setPhoneError] = useState('');
     const [passwordError, setPasswordError] = useState('');
     const navigate = useNavigate();
+    const { login } = useAuth();
 
     const validateForm = () => {
         let isValid = true;
@@ -33,39 +35,39 @@ const LoginPage: React.FC = () => {
     };
 
     const handleLogin = async () => {
-    if (validateForm()) {
-        try {
-            const response = await fetch('http://localhost:3000/api/taikhoan/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    TenDangNhap: phoneNumber,
-                    MatKhau: password
-                })
-            });
+        if (validateForm()) {
+            try {
+                const response = await fetch('http://localhost:3000/api/taikhoan/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        TenDangNhap: phoneNumber,
+                        MatKhau: password
+                    })
+                });
 
-            const data = await response.json();
+                const data = await response.json();
 
-            if (response.ok) {
-                console.log('Đăng nhập thành công:', data);
-                // Ví dụ: lưu username và role vào localStorage
-                localStorage.setItem('username', data.username);
-                localStorage.setItem('role', data.role);
-
-                // Điều hướng đến trang chính sau khi đăng nhập
-                navigate('/dashboard');
-            } else {
-                console.error('Lỗi đăng nhập:', data.message);
-                setPasswordError(data.message || 'Sai tài khoản hoặc mật khẩu');
+                if (response.ok) {
+                    console.log('Đăng nhập thành công:', data);
+                    // Ví dụ: lưu username và role vào localStorage
+                    localStorage.setItem('username', data.username);
+                    login(data.role);
+                    
+                    // Điều hướng đến trang sảnh tiệc sau khi đăng nhập
+                    navigate('/sanh-tiec');
+                } else {
+                    console.error('Lỗi đăng nhập:', data.message);
+                    setPasswordError(data.message || 'Sai tài khoản hoặc mật khẩu');
+                }
+            } catch (error) {
+                console.error('Lỗi kết nối máy chủ:', error);
+                setPasswordError('Không thể kết nối tới máy chủ');
             }
-        } catch (error) {
-            console.error('Lỗi kết nối máy chủ:', error);
-            setPasswordError('Không thể kết nối tới máy chủ');
         }
-    }
-};
+    };
 
 
     const handleClickShowPassword = () => setShowPassword((show) => !show);

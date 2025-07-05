@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import styles from './Sidebar.module.css';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   ChevronLeft,
   ChevronRight,
@@ -11,25 +11,37 @@ import {
   Gift,
   ChartArea,
   Settings,
-  LogIn,
+  LogOut,
 } from 'lucide-react';
 import IconButton from '@mui/material/IconButton';
+import { Box } from '@mui/material';
+import { useAuth } from '../../auth/AuthContext';
+import { RoleBasedRender } from '../RoleBasedRender';
 
 export default function Sidebar() {
   const [expanded, setExpanded] = useState(true);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { role, logout } = useAuth();
 
-  const menuItems = [
+  const rawMenuItems = [
     { path: 'sanh-tiec', icon: <Landmark size={26} />, label: 'Sảnh tiệc' },
     { path: 'tiec-cuoi', icon: <Wine size={26} />, label: 'Tiệc cưới' },
     { path: 'lich-su-kien/tuan', icon: <Calendar size={26} />, label: 'Lịch sự kiện' },
     { path: 'mon-an', icon: <Utensils size={26} />, label: 'Món ăn' },
     { path: 'dich-vu', icon: <Gift size={26} />, label: 'Dịch vụ' },
-    { path: 'bao-cao', icon: <ChartArea size={26} />, label: 'Báo cáo' },
-    { path: 'cai-dat', icon: <Settings size={26} />, label: 'Cài đặt' },
-    //them login
-    { path: 'login', icon: <LogIn size={26} />, label: 'login' },
+    { path: 'bao-cao', icon: <ChartArea size={26} />, label: 'Báo cáo', roles: ['Admin'] },
+    { path: 'cai-dat', icon: <Settings size={26} />, label: 'Cài đặt', roles: ['Admin'] },
   ];
+  
+  const menuItems = rawMenuItems.filter(item =>
+    !item.roles || (role !== null && item.roles.includes(role))
+  );
+
+  const handleLogOut = () => {
+    logout();
+    navigate("/login")
+  }
 
   return (
     <nav className={`${styles.sidebar} ${!expanded ? styles.sidebarCollapsed : ''}`}>
@@ -57,6 +69,14 @@ export default function Sidebar() {
             </Link>
           );
         })}
+
+        <Box className={styles.sidebarListItem} onClick={handleLogOut}>
+          <LogOut />
+          <div className={`${styles.sidebarListItemText} ${!expanded ? styles.collapsed : ''}`}>
+            Đăng xuất
+          </div>
+          {!expanded && <div className={styles.tooltip}>Đăng xuất</div>}
+        </Box>
       </div>
     </nav>
   );

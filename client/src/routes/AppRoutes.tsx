@@ -9,21 +9,59 @@ import Settings from "../pages/Settings/Settings.tsx";
 import Login from "../pages/Login/Login.tsx"
 import Register from "../pages/Login/Register.tsx"
 import PartyBooking from "../pages/PartyBooking/PartyBooking.tsx";
+import { ProtectedRoute } from "../auth/ProtectedRoute.tsx";
+import { useAuth } from "../auth/AuthContext.tsx";
+import { Navigate } from "react-router-dom";
 
 export default function AppRoutes() {
+  const { role } = useAuth();
+
   return (
     <Routes>
+      <Route
+        path="/dat-tiec"
+        element={
+          <ProtectedRoute allow="NhanVien">
+            <PartyBooking />
+          </ProtectedRoute>
+        }
+      />
+
       <Route path="/dat-tiec" element={<PartyBooking />} />
       <Route path="/sanh-tiec" element={<Hall />} />
       <Route path="/tiec-cuoi" element={<Party />} />
       <Route path="/lich-su-kien/:view" element={<Schedule />} />
       <Route path="/mon-an" element={<Food />} />
       <Route path="/dich-vu" element={<Service />} />
-      <Route path="/bao-cao" element={<Report />} />
-      <Route path="/cai-dat" element={<Settings />} />
+
+      <Route
+        path="/bao-cao"
+        element={
+          <ProtectedRoute allow="Admin">
+            <Report />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/cai-dat"
+        element={
+          <ProtectedRoute allow="Admin">
+            <Settings />
+          </ProtectedRoute>
+        }
+      />
+
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
-      <Route path="*" element={<Hall />} />
+
+      <Route
+        path="*"
+        element={
+          role
+            ? <Navigate to="/sanh-tiec" replace />
+            : <Navigate to="/login" replace />
+        }
+      />
     </Routes>
   );
 }
