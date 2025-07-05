@@ -80,7 +80,7 @@ export default function Food() {
             // ...bổ sung các điều kiện cho món khác nếu muốn
             console.log("FE nhận từ BE _id:", item._id);
             return {
-                id: item.MAMONAN || item._id,
+                id: item._id,
                 _id: item._id,
                 name: item.TENMONAN,
                 description: item.GHICHU,
@@ -93,11 +93,10 @@ export default function Food() {
         })
         .catch(err => console.error(err));
 }, []);
-    const filteredFoods = foods.filter(food => {
-        const matchesCategory = selectedCategory === 'Tất cả' || food.category === selectedCategory;
-        const matchesSearch = food.name.toLowerCase().includes(searchKey.toLowerCase());
-        return matchesCategory && matchesSearch;
-    });
+    const filteredFoods = selectedCategory === 'Tất cả'
+    ? foods
+    : foods.filter(food => food.category === selectedCategory);
+    
     const handleCloseDialog = () => {
         setOpenDialog(false);
         setNewFood({
@@ -117,15 +116,17 @@ export default function Food() {
     };
 
     const handleAddFood = (data: any) => {
+        
     // data sẽ có cả category, nhưng bạn chỉ lấy các trường cần gửi lên BE
     const payload = {
-        MAMONAN: `mon-an-${Date.now()}`,
         TENMONAN: data.name,
         GHICHU: data.description,
         DONGIA: data.price,
         LOAI: data.category
         // KHÔNG gửi category lên backend!
     };
+    console.log("Gửi lên BE:", payload);
+
 
     fetch('http://localhost:3000/api/monan', {
         method: 'POST',
@@ -134,6 +135,7 @@ export default function Food() {
     })
     .then(res => res.json())
     .then(newFood => {
+    console.log("Kết quả trả về:", newFood);
     if (!newFood || !newFood.TENMONAN) {
         alert("Thêm món ăn thất bại! Kiểm tra lại dữ liệu nhập.");
         return;
@@ -141,7 +143,7 @@ export default function Food() {
     setFoods(prev => [
         ...prev,
         {
-            id: newFood.MAMONAN || newFood._id || Date.now(),
+            id:  newFood._id ,
             _id: newFood._id || "", 
             name: newFood.TENMONAN,
             description: newFood.GHICHU,

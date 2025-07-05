@@ -54,12 +54,6 @@ export default function Service() {
     const [searchKey, setSearchKey] = useState("");
     const categories = ['Tất cả', 'Trang Trí', 'MC & Ca Sĩ', 'Quay Chụp', 'Làm Đẹp', 'Trang Phục', 'Phương Tiện', 'Thiệp & Quà', 'Bánh & Rượu', 'An Ninh'];
     const [services, setServices] = useState<ServiceType[]>([]);
-
-    const filteredServices = services.filter(service => {
-        const matchesCategory = selectedCategory === 'Tất cả' || service.category === selectedCategory;
-        const matchesSearch = service.name.toLowerCase().includes(searchKey.toLowerCase());
-        return matchesCategory && matchesSearch;
-    });
     const handleServiceClick = (service: IService) => {
         setSelectedService(service);
         setDetailDialogOpen(true);
@@ -81,11 +75,14 @@ export default function Service() {
                     description: item.GHICHU,
                     price: item.DONGIA,
                     category: item.DANHMUC,
-                    image:      getServiceImage({ name: item.TENDICHVU }),
+                    image: getServiceImage({ name: item.TENDICHVU }),
                 }));
                 setServices(mapped);
             });
     }, []);
+    const filteredServices = selectedCategory === 'Tất cả'
+    ? services
+    : services.filter(service => service.category === selectedCategory);
 
     const handleOpenAddServiceDialog = () => {
         setOpenAddServiceDialog(true);
@@ -95,7 +92,6 @@ export default function Service() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-            MADICHVU: `dv-${Date.now()}`,
             TENDICHVU: data.name,
             GHICHU: data.description,
             DONGIA: data.price,
@@ -139,6 +135,7 @@ export default function Service() {
                 description: newService.GHICHU,
                 price: newService.DONGIA,
                 category: newService.DANHMUC,
+                image: getServiceImage({ name: newService.TENDICHVU })
             }
             : s
         )

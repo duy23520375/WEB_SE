@@ -1,10 +1,6 @@
 const mongoose = require('mongoose')
 
 const DichvuSchema = new mongoose.Schema({
-  MADICHVU: {
-    type: String,
-    required: true
-  },
   TENDICHVU: {
     type: String,
     required: true

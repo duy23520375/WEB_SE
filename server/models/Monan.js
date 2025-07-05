@@ -1,10 +1,6 @@
 const mongoose = require('mongoose')
 
 const MonanSchema = new mongoose.Schema({
-  MAMONAN: {
-    type: String,
-    required: true
-  },
   TENMONAN: {
     type: String,
     required: true
