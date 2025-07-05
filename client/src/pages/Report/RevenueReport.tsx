@@ -12,9 +12,7 @@ export default function RevenueReport() {
   );
   const [selectedYear, setSelectedYear] = useState<number>(dayjs().year());
   const currentYear = dayjs().year();
-
-  // gọi “fakeData” để khỏi phải đổi các chỗ dùng sau
-  const [fakeData, setFakeData] = useState<IMonthlyReport[]>([]);
+  const [fetchData, setFetchData] = useState<IMonthlyReport[]>([]);
 
   // mỗi khi tháng hoặc năm thay đổi, fetch rồi filter & nhóm
   useEffect(() => {
@@ -55,7 +53,7 @@ export default function RevenueReport() {
           }
         );
 
-        setFakeData(reportArr);
+        setFetchData(reportArr);
       } catch (err) {
         console.error("Load report lỗi:", err);
       }
@@ -65,20 +63,20 @@ export default function RevenueReport() {
 
   // tính tổng và chartData
   const totalEvent = useMemo(
-    () => fakeData.reduce((sum, d) => sum + d.eventCount, 0),
-    [fakeData]
+    () => fetchData.reduce((sum, d) => sum + d.eventCount, 0),
+    [fetchData]
   );
   const totalRevenue = useMemo(
-    () => fakeData.reduce((sum, d) => sum + d.revenue, 0),
-    [fakeData]
+    () => fetchData.reduce((sum, d) => sum + d.revenue, 0),
+    [fetchData]
   );
   const chartData = useMemo(
     () =>
-      fakeData.map((d) => ({
+      fetchData.map((d) => ({
         ...d,
         percent: ((d.revenue / (totalRevenue || 1)) * 100).toFixed(2),
       })),
-    [fakeData, totalRevenue]
+    [fetchData, totalRevenue]
   );
 
   const options = {

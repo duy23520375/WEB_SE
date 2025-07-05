@@ -20,6 +20,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
 import { useNavigate } from "react-router-dom";
+import { RoleBasedRender } from "../../components/RoleBasedRender";
 
 
 
@@ -30,80 +31,52 @@ export default function PartyPage() {
 
     const [parties, setParties] = useState<IParty[]>([]);
     const [halls, setHalls] = useState<any[]>([]); // Thêm state lưu danh sách sảnh
-    useEffect(() => {
-        fetch("http://localhost:3000/api/tieccuoi")
-            .then(res => res.json())
-            .then(data => {
-    const mapped = data.map((item: any, idx: number) => {
-        let status = item.TRANGTHAI || "Đã đặt cọc"
-        return {
-            code: `TC${(idx + 1).toString().padStart(2, "0")}`,
-            id: item._id,
-            groom: item.TENCR,
-            bride: item.TENCD,
-            phone: item.SDT,
-            shift: item.CA,
-            hall: item.MASANH,
-            date: item.NGAYDAI,
-            deposit: item.TIENCOC,
-            tables: item.SOLUONGBAN,
-            reserveTables: item.SOBANDT,
-            status, // Thêm trường này
-        };
-    });
-    setParties(mapped);
-});
-        // Fetch danh sách sảnh
-        fetch("http://localhost:3000/api/sanh")
-            .then(res => res.json())
-            .then(data => setHalls(data));
-    }, []);
-
-    // Các useState khác phải đặt ở đây, KHÔNG đặt sau useEffect!
     const [searchKey, setSearchKey] = useState("");
     const [searchBy, setSearchBy] = useState<PartyKey>("groom");
     const [filterShift, setFilterShift] = useState("");
     const [filterHall, setFilterHall] = useState("");
-    
-    const [fromDate, setFromDate] = useState(dayjs('2000-01-01').toISOString());
-    const [toDate, setToDate] = useState(dayjs('2100-12-31').toISOString());
+    const [fromDate, setFromDate] = useState(dayjs().subtract(1, "month").toISOString());
+    const [toDate, setToDate] = useState(dayjs().add(5, 'year').toISOString());
     const [isPartyFormOpen, setIsPartyFormOpen] = useState(false);
     const [isBillFormOpen, setIsBillFormOpen] = useState(false);
+    const [isReadOnlyForm, setIsReadOnlyForm] = useState(false);
     const [editData, setEditData] = useState<IParty | null>(null);
+    const [partyHallName, setPartyHallName] = useState("");
     const [billPartyData, setBillPartyData] = useState<IParty | null>(null);
     const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
     const [deleteId, setDeleteId] = useState(null);
 
     const fetchParties = () => {
-    fetch("http://localhost:3000/api/tieccuoi")
-        .then(res => res.json())
-        .then(data => {
-            const mapped = data.map((item: any, idx: number) => {
-                return {
-                    code: item.MATIEC,
-                    id: item._id,
-                    groom: item.TENCR,
-                    bride: item.TENCD,
-                    phone: item.SDT,
-                    shift: item.CA,
-                    hall: item.MASANH,
-                    date: item.NGAYDAI,
-                    deposit: item.TIENCOC,
-                    tables: item.SOLUONGBAN,
-                    reserveTables: item.SOBANDT,
-                    status: item.TRANGTHAI || "Đã đặt cọc", // ✅ Lấy đúng từ DB
-                };
-            });
+        fetch("http://localhost:3000/api/tieccuoi")
+            .then(res => res.json())
+            .then(data => {
+                const mapped = data.map((item: any, idx: number) => {
+                    return {
+                        code: item.MATIEC,
+                        id: item._id,
+                        groom: item.TENCR,
+                        bride: item.TENCD,
+                        phone: item.SDT,
+                        shift: item.CA,
+                        hall: item.MASANH,
+                        date: item.NGAYDAI,
+                        deposit: item.TIENCOC,
+                        tables: item.SOLUONGBAN,
+                        reserveTables: item.SOBANDT,
+                        status: item.TRANGTHAI || "Đã đặt cọc", // ✅ Lấy đúng từ DB
+                    };
+                });
 
-            setParties(mapped);
-        });
-};
-        useEffect(() => {
-            fetchParties(); // tải danh sách tiệc cưới ban đầu
-            fetch("http://localhost:3000/api/sanh")
-                .then(res => res.json())
-                .then(data => setHalls(data));
-        }, []);
+                setParties(mapped);
+            });
+    };
+
+    useEffect(() => {
+        fetchParties(); // tải danh sách tiệc cưới ban đầu
+        fetch("http://localhost:3000/api/sanh")
+            .then(res => res.json())
+            .then(data => setHalls(data));
+    }, []);
 
     const filteredParties = parties.filter((party) => {
         const partyDate = dayjs(party.date);
@@ -134,7 +107,16 @@ export default function PartyPage() {
         navigate("/dat-tiec");
     };
 
-    const handleEdit = (party: IParty) => {
+    const handleRead = (party: IParty, hallName: string) => {
+        setIsReadOnlyForm(true);
+        setPartyHallName(hallName);
+        setEditData(party);
+        setIsPartyFormOpen(true);
+    };
+
+    const handleEdit = (party: IParty, hallName: string) => {
+        setIsReadOnlyForm(false);
+        setPartyHallName(hallName);
         setEditData(party);
         setIsPartyFormOpen(true);
     };
@@ -187,7 +169,7 @@ export default function PartyPage() {
                             onChange={(e) => setSearchKey(e.target.value)}
                         />
                     </Box>
-                    
+
                     <FormControl
                         sx={{
                             flex: 1,
@@ -253,7 +235,7 @@ export default function PartyPage() {
                     />
 
                     <PartyFilter
-                        label="Chọn sảnh"
+                        label="Chọn loại sảnh"
                         value={filterHall}
                         onChange={(e) => setFilterHall(e.target.value)}
                         children={["A", "B", "C", "D", "E"]}
@@ -323,22 +305,6 @@ export default function PartyPage() {
                                             '& .MuiDayCalendar-slideTransition': {
                                                 minHeight: 0,
                                                 marginBottom: '4px'
-                                            },
-                                        },
-                                    },
-                                    day: {
-                                        sx: {
-                                            color: "#8f9091",
-                                            borderRadius: '10px',
-                                            '&:hover': {
-                                                backgroundColor: '#e3f2fd',
-                                            },
-                                            '&.MuiPickersDay-root.Mui-selected': {
-                                                backgroundColor: '#4880FF',
-                                                color: '#fff',
-                                                '&:hover': {
-                                                    backgroundColor: '#4880FF'
-                                                }
                                             },
                                         },
                                     },
@@ -412,53 +378,40 @@ export default function PartyPage() {
                                             },
                                         },
                                     },
-                                    day: {
-                                        sx: {
-                                            color: "#8f9091",
-                                            borderRadius: '10px',
-                                            '&:hover': {
-                                                backgroundColor: '#e3f2fd',
-                                            },
-                                            '&.MuiPickersDay-root.Mui-selected': {
-                                                backgroundColor: '#4880FF',
-                                                color: '#fff',
-                                                '&:hover': {
-                                                    backgroundColor: '#4880FF'
-                                                }
-                                            },
-                                        },
-                                    },
                                 }}
                             />
                         </Box>
                     </LocalizationProvider>
                 </Box>
 
-                <Button
-                    variant="contained"
-                    startIcon={<PlusCircle />}
-                    onClick={handleAdd}
-                    sx={{
-                        alignSelf: 'flex-end',
-                        padding: '10px 30px',
-                        fontSize: "14px",
-                        fontWeight: "bold",
-                        borderRadius: '8px',
-                        backgroundColor: "#4880FF",
-                        "&:hover": {
-                            backgroundColor: "#3578f0",
-                        },
-                        textTransform: "none",
-                    }}
-                >
-                    Create
-                </Button>
+                <RoleBasedRender allow="NhanVien">
+                    <Button
+                        variant="contained"
+                        startIcon={<PlusCircle />}
+                        onClick={handleAdd}
+                        sx={{
+                            alignSelf: 'flex-end',
+                            padding: '10px 30px',
+                            fontSize: "14px",
+                            fontWeight: "bold",
+                            borderRadius: '8px',
+                            backgroundColor: "#4880FF",
+                            "&:hover": {
+                                backgroundColor: "#3578f0",
+                            },
+                            textTransform: "none",
+                        }}
+                    >
+                        Đặt tiệc
+                    </Button>
+                </RoleBasedRender>
             </Box>
 
             {/* Table */}
             <PartyTable
                 data={filteredParties}
                 searchKey={searchKey}
+                handleRead={handleRead}
                 handleEdit={handleEdit}
                 handleDelete={handleDelete}
                 halls={halls} // Truyền thêm prop halls
@@ -469,41 +422,39 @@ export default function PartyPage() {
                 open={isPartyFormOpen}
                 onClose={() => setIsPartyFormOpen(false)}
                 onSubmit={(data) => {
-    const payload = {
-        TENCR: data.groom,
-        TENCD: data.bride,
-        SDT: data.phone,
-        CA: data.shift,
-        _id: data.hall,
-        NGAYDAI: data.date,
-        TIENCOC: data.deposit,
-        SOLUONGBAN: data.tables,
-        SOBANDT: data.reserveTables,
-        TRANGTHAI: data.status || "Đã đặt cọc"
-    };
+                    const payload = {
+                        TENCR: data.groom,
+                        TENCD: data.bride,
+                        SDT: data.phone,
+                        CA: data.shift,
+                        _id: data.hall,
+                        NGAYDAI: data.date,
+                        TIENCOC: data.deposit,
+                        SOLUONGBAN: data.tables,
+                        SOBANDT: data.reserveTables,
+                        TRANGTHAI: data.status || "Đã đặt cọc"
+                    };
 
-    fetch(`http://localhost:3000/api/tieccuoi/${editData?.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-    })
-    .then((res) => {
-        if (!res.ok) throw new Error("Sửa thất bại");
-        return res.json();
-    })
-    .then(() => {
-        fetchParties(); // load lại data mới nhất
-    })
-    .catch((err) => {
-        console.error("Lỗi khi sửa:", err);
-        alert("Sửa thất bại, vui lòng thử lại.");
-    });
+                    fetch(`http://localhost:3000/api/tieccuoi/${editData?.id}`, {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(payload),
+                    })
+                        .then((res) => {
+                            if (!res.ok) throw new Error("Sửa thất bại");
+                            return res.json();
+                        })
+                        .then(() => {
+                            fetchParties(); // load lại data mới nhất
+                        })
+                        .catch((err) => {
+                            console.error("Lỗi khi sửa:", err);
+                            alert("Sửa thất bại, vui lòng thử lại.");
+                        });
 
-    setIsPartyFormOpen(false);
-    setEditData(null);
-}}
-
-
+                    setIsPartyFormOpen(false);
+                    setEditData(null);
+                }}
 
                 onExportBill={(partyData) => {
                     setBillPartyData(partyData);
@@ -511,7 +462,8 @@ export default function PartyPage() {
                     setIsBillFormOpen(true);
                 }}
                 initialData={editData}
-                readOnly={editData ? false : false} 
+                readOnly={isReadOnlyForm}
+                hallName={partyHallName}
             />
 
             <BillForm
@@ -522,30 +474,31 @@ export default function PartyPage() {
             />
 
             <ConfirmDelete
-            open={isDeleteConfirmOpen}
-            onClose={() => setIsDeleteConfirmOpen(false)}
-            onConfirm={() => {
-                if (!deleteId) return;
+                open={isDeleteConfirmOpen}
+                onClose={() => setIsDeleteConfirmOpen(false)}
+                onConfirm={() => {
+                    if (!deleteId) return;
 
-                fetch(`http://localhost:3000/api/tieccuoi/${deleteId}`, {
-                    method: 'DELETE',
-                })
-                .then((res) => {
-                    if (!res.ok) throw new Error("Xóa thất bại");
+                    fetch(`http://localhost:3000/api/tieccuoi/${deleteId}`, {
+                        method: 'DELETE',
+                    })
+                        .then((res) => {
+                            if (!res.ok) throw new Error("Xóa thất bại");
 
-                    // Xóa khỏi state
-                    setParties((prev) => prev.filter(p => p.id !== deleteId));
-                })
-                .catch((err) => {
-                    console.error("Lỗi khi xóa:", err);
-                    alert("Xóa thất bại, vui lòng thử lại.");
-                })
-                .finally(() => {
-                    setIsDeleteConfirmOpen(false);
-                    setDeleteId(null);
-                });}}
+                            // Xóa khỏi state
+                            setParties((prev) => prev.filter(p => p.id !== deleteId));
+                        })
+                        .catch((err) => {
+                            console.error("Lỗi khi xóa:", err);
+                            alert("Xóa thất bại, vui lòng thử lại.");
+                        })
+                        .finally(() => {
+                            setIsDeleteConfirmOpen(false);
+                            setDeleteId(null);
+                        });
+                }}
 
-        />
+            />
 
         </Box>
     );

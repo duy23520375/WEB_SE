@@ -6,18 +6,14 @@ import {
     CardContent,
     CardMedia,
     Dialog,
-    TextField,
     FormControl,
-    InputLabel,
     Select,
     MenuItem,
     SelectChangeEvent,
     Button,
-    InputAdornment,
 } from "@mui/material";
 import PetalAnimation from '../../components/Animations/PetalAnimation';
 import TableRestaurantIcon from '@mui/icons-material/TableRestaurant';
-import SearchIcon from '@mui/icons-material/Search';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -40,23 +36,9 @@ import hallD3Image from "../../assets/ảnh 12.jpg";
 import hallE1Image from "../../assets/ảnh 13.jpg";
 import hallE2Image from "../../assets/ảnh 14.jpeg";
 import hallE3Image from "../../assets/ảnh 15.jpg";
-const imageMap: Record<string, string> = {
-    "ảnh 1.webp": hallA1Image,
-    "ảnh 2.webp": hallA2Image,
-    "ảnh 3.jpg": hallA3Image,
-    "ảnh 4.jpg": hallB1Image,
-    "ảnh 5.jpg": hallB2Image,
-    "ảnh 6.png": hallB3Image,
-    "ảnh 7.jpg": hallC1Image,
-    "ảnh 8.jpg": hallC2Image,
-    "ảnh 9.jpg": hallC3Image,
-    "ảnh 10.jpg": hallD1Image,
-    "ảnh 11.jpg": hallD2Image,
-    "ảnh 12.jpg": hallD3Image,
-    "ảnh 13.jpg": hallE1Image,
-    "ảnh 14.jpeg": hallE2Image,
-    "ảnh 15.jpg": hallE3Image,
-};
+import { RoleBasedRender } from "../../components/RoleBasedRender.tsx";
+import SearchBar from "../../components/SearchBar.tsx";
+
 interface IHallInfo {
     _id: string;
     TENSANH: string;
@@ -112,17 +94,17 @@ export default function HallPage() {
         (selectedType === 'all' || hall.LOAISANH === selectedType)
     );
     const handleUpdateHall = async (updatedHall: IHallInfo) => {
-    // Gọi API cập nhật
-    await fetch(`http://localhost:3000/api/sanh/${updatedHall._id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updatedHall),
-    });
-    // Lấy lại danh sách mới từ DB
-    const res = await fetch("http://localhost:3000/api/sanh");
-    const data = await res.json();
-    setHalls(data);
-};
+        // Gọi API cập nhật
+        await fetch(`http://localhost:3000/api/sanh/${updatedHall._id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(updatedHall),
+        });
+        // Lấy lại danh sách mới từ DB
+        const res = await fetch("http://localhost:3000/api/sanh");
+        const data = await res.json();
+        setHalls(data);
+    };
     const handleHallClick = (_id: string) => {
         setSelectedHall(_id);
     };
@@ -195,62 +177,88 @@ export default function HallPage() {
             <Typography
                 sx={{
                     userSelect: "none",
-                    color: "var(--text-color)",
                     fontWeight: "bold",
                     fontSize: "32px",
-                    marginBottom: "20px",
+                    marginX: "20px",
                 }}
             >
                 Danh sách sảnh
             </Typography>
 
-            <Box sx={{ display: 'flex', gap: 2, marginBottom: '20px' }}>
-                <TextField
-                    label="Tìm kiếm theo tên sảnh"
-                    variant="outlined"
-                    value={searchQuery}
-                    onChange={handleSearchChange}
-                    sx={{ flexGrow: 1, borderRadius: '50px', '& .MuiOutlinedInput-root': { borderRadius: '50px' } }}
-                    InputProps={{
-                        startAdornment: (
-                            <InputAdornment position="start">
-                                <SearchIcon />
-                            </InputAdornment>
-                        ),
-                    }}
-                    placeholder="Tìm kiếm"
-                />
-                <FormControl sx={{ minWidth: 120, borderRadius: '50px', '& .MuiOutlinedInput-root': { borderRadius: '50px' } }}>
-                    <InputLabel id="hall-type-select-label">Loại sảnh</InputLabel>
-                    <Select
-                        labelId="hall-type-select-label"
-                        id="hall-type-select"
-                        value={selectedType}
-                        label="Loại sảnh"
-                        onChange={handleTypeChange}
+            <Box
+                sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    marginBottom: "40px",
+                    marginX: "20px",
+                }}
+            >
+                <Box sx={{
+                    display: 'flex',
+                    gap: '10px',
+                    width: "60%",
+                    alignItems: 'flex-end',
+                }}>
+                    <Box sx={{ flex: 3, }}>
+                        <SearchBar
+                            value={searchQuery}
+                            onChange={handleSearchChange} />
+                    </Box>
+
+                    <Box sx={{
+                        flex: 1,
+                        display: 'flex',
+                        flexDirection: 'column',
+                    }}>
+                        <Typography sx={{ fontSize: '14px', fontWeight: 'bold' }}>
+                            Chọn loại sảnh
+                        </Typography>
+                        <FormControl sx={{
+                            "& fieldset": {
+                                borderRadius: "10px",
+                            },
+                            "& .MuiInputBase-input": {
+                                paddingY: "10px",
+                                paddingLeft: "14px",
+                                backgroundColor: '#fff',
+                            },
+                        }}>
+                            <Select
+                                value={selectedType}
+                                onChange={handleTypeChange}
+                            >
+                                <MenuItem value="all">Tất cả</MenuItem>
+                                {hallTypes.map((type) => (
+                                    <MenuItem key={type} value={type}>{`Loại ${type}`}</MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                    </Box>
+                </Box>
+
+                <RoleBasedRender allow="Admin">
+                    <Button
+                        variant="contained"
+                        startIcon={<AddCircleOutlineIcon />}
+                        sx={{
+                            alignSelf: 'flex-end',
+                            padding: '10px 30px',
+                            fontSize: "14px",
+                            fontWeight: "bold",
+                            borderRadius: '8px',
+                            backgroundColor: '#4880FF',
+                            '&:hover': {
+                                backgroundColor: "#3578f0",
+                                boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)',
+                            },
+                            textTransform: "none",
+                        }}
+                        onClick={handleOpenAddHallDialog}
                     >
-                        <MenuItem value="all">Tất cả</MenuItem>
-                        {hallTypes.map((type) => (
-                            <MenuItem key={type} value={type}>{`Loại ${type}`}</MenuItem>
-                        ))}
-                    </Select>
-                </FormControl>
-                <Button
-                    variant="contained"
-                    startIcon={<AddCircleOutlineIcon />}
-                    sx={{
-                        whiteSpace: 'nowrap',
-                        borderRadius: '50px',
-                        backgroundColor: '#4880FF',
-                        '&:hover': {
-                            backgroundColor: '#3a66cc',
-                            boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)',
-                        },
-                    }}
-                    onClick={handleOpenAddHallDialog}
-                >
-                    Thêm sảnh
-                </Button>
+                        Thêm sảnh
+                    </Button>
+                </RoleBasedRender>
             </Box>
 
             <Box sx={{
@@ -280,25 +288,58 @@ export default function HallPage() {
                         }}
                         onClick={() => handleHallClick(hall._id)}
                     >
-                        <Box sx={{
-                            position: 'absolute',
-                            top: 8,
-                            right: 8,
-                            display: 'flex',
-                            gap: 1,
-                            zIndex: 2,
-                        }} onClick={e => e.stopPropagation()}>
-                            <Button size="small" sx={{ minWidth: 0, p: 0.5 }} onClick={() => handleEditClick(hall._id)}>
-                                <Box>
-                                    <EditIcon fontSize="small" sx={{ color: '#00e1ff', opacity: 0.85, transition: 'opacity 0.2s' }} />
-                                </Box>
-                            </Button>
-                            <Button size="small" sx={{ minWidth: 0, p: 0.5 }} onClick={() => handleDeleteClick(hall._id)}>
-                                <Box>
-                                    <DeleteIcon fontSize="small" sx={{ color: '#ff0000', opacity: 0.85, transition: 'opacity 0.2s' }} />
-                                </Box>
-                            </Button>
-                        </Box>
+                        <RoleBasedRender allow="Admin">
+                            <Box sx={{
+                                position: 'absolute',
+                                top: 8,
+                                right: 8,
+                                display: 'flex',
+                                gap: 1,
+                                zIndex: 2,
+                            }} onClick={e => e.stopPropagation()}>
+                                <Button size="small" sx={{ minWidth: 0, p: 0.5 }} onClick={() => handleEditClick(hall._id)}>
+                                    <Box
+                                        sx={{
+                                            bgcolor: '#fff',
+                                            borderRadius: '50%',
+                                            p: '4px',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                                            transition: 'background 0.2s, box-shadow 0.2s',
+                                            '&:hover': {
+                                                bgcolor: '#f0f0f0',
+                                                boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
+                                            }
+                                        }}
+                                    >
+                                        <EditIcon fontSize="small" sx={{ color: '#00e1ff', opacity: 0.85, transition: 'opacity 0.2s' }} />
+                                    </Box>
+                                </Button>
+                                <Button size="small" sx={{ minWidth: 0, p: 0.5 }} onClick={() => handleDeleteClick(hall._id)}>
+                                    <Box
+                                        sx={{
+                                            bgcolor: '#fff',
+                                            borderRadius: '50%',
+                                            p: '4px',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                                            transition: 'background 0.2s, box-shadow 0.2s',
+                                            '&:hover': {
+                                                bgcolor: '#f0f0f0',
+                                                boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
+                                            }
+                                        }}
+                                    >
+                                        <DeleteIcon fontSize="small" sx={{ color: '#ff0000', opacity: 0.85, transition: 'opacity 0.2s' }} />
+                                    </Box>
+                                </Button>
+                            </Box>
+                        </RoleBasedRender>
+
                         <CardMedia
                             component="img"
                             image={getHallImage(hall.TENSANH)}

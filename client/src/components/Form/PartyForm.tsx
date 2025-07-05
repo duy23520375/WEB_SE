@@ -12,11 +12,7 @@ import {
     FormControl,
 } from "@mui/material";
 import { useState, useEffect } from "react";
-import { defaultBgColorMap, defaultTextColorMap } from "../../assets/color/ColorMap";
-import { DatePicker, } from '@mui/x-date-pickers';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import dayjs from 'dayjs';
+import { formatDate } from "../../utils/formatDate";
 
 export default function PartyForm({
     open,
@@ -25,13 +21,15 @@ export default function PartyForm({
     onExportBill,
     initialData,
     readOnly,
+    hallName,
 }: {
     open: boolean;
     onClose: () => void;
     onSubmit: (data: any) => void;
     onExportBill: (partyData: any) => void;
     initialData?: any;
-    readOnly: boolean
+    readOnly: boolean;
+    hallName: string;
 }) {
     const [form, setForm] = useState({
         id: 0,
@@ -96,9 +94,7 @@ export default function PartyForm({
             }}>
                 {readOnly ?
                     "Thông tin tiệc"
-                    : initialData ?
-                        "Cập nhật thông tin tiệc"
-                        : "Đặt tiệc"
+                    : initialData && "Cập nhật thông tin tiệc"
                 }
             </DialogTitle>
 
@@ -154,99 +150,17 @@ export default function PartyForm({
                         flexDirection: ({ xs: 'column', sm: 'row', }),
                         gap: '18px',
                     }}>
-                        <LocalizationProvider dateAdapter={AdapterDayjs}>
-                            <FormControl fullWidth sx={{
-                                flexDirection: 'column',
-                            }}>
-                                <Typography sx={{ fontSize: '14px', fontWeight: 'bold' }}>
-                                    Ngày tổ chức
-                                </Typography>
-                                <DatePicker
-                                    value={dayjs(form.date)}
-                                    format="DD/MM/YYYY"
-                                    onChange={(value) => setForm({
-                                        ...form,
-                                        date: (value?.toDate() || new Date()).toString()
-                                    })}
-                                    disabled={readOnly}
-                                    sx={{
-                                        "& .MuiPickersInputBase-root": {
-                                            backgroundColor: '#fff',
-                                            borderRadius: "10px",
-                                            gap: '5px',
-                                            '& .MuiPickersOutlinedInput-root.Mui-error .MuiPickersOutlinedInput-notchedOutline': {
-                                                borderColor: 'rgba(0, 0, 0, 0.23)'
-                                            }
-                                        },
-                                        "& .MuiPickersSectionList-root": {
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            height: '61px',
-                                            paddingY: '0px',
-                                        },
-                                    }}
-                                    slotProps={{
-                                        popper: {
-                                            sx: {
-                                                '& .MuiPaper-root': {
-                                                    borderRadius: '20px',
-                                                },
-                                                '& .MuiDateCalendar-root': {
-                                                    padding: '18px 20px',
-                                                    gap: '10px',
-                                                    maxHeight: '360px',
-                                                    height: 'auto',
-                                                    width: '310px'
-                                                },
-                                                '& .MuiPickersCalendarHeader-root': {
-                                                    padding: '0 8px',
-                                                    margin: 0,
-                                                    justifyContent: 'space-between',
-                                                },
-                                                '& .MuiPickersCalendarHeader-labelContainer': {
-                                                    color: '#202224',
-                                                    fontWeight: 600,
-                                                    fontSize: '15px',
-                                                    margin: 0,
-                                                },
-                                                '& .MuiPickersArrowSwitcher-root': {
-                                                    gap: '5px'
-                                                },
-                                                '& .MuiPickersArrowSwitcher-button': {
-                                                    padding: 0,
-                                                    backgroundColor: '#e7e9ee',
-                                                    borderRadius: '5px'
-                                                },
-                                                '& .MuiTypography-root': {
-                                                    color: '#454545',
-                                                },
-                                                '& .MuiDayCalendar-slideTransition': {
-                                                    minHeight: 0,
-                                                    marginBottom: '4px'
-                                                },
-                                            },
-
-                                        },
-                                        day: {
-                                            sx: {
-                                                color: "#8f9091",
-                                                borderRadius: '10px',
-                                                '&:hover': {
-                                                    backgroundColor: '#e3f2fd',
-                                                },
-                                                '&.MuiPickersDay-root.Mui-selected': {
-                                                    backgroundColor: '#4880FF',
-                                                    color: '#fff',
-                                                    '&:hover': {
-                                                        backgroundColor: '#4880FF'
-                                                    }
-                                                },
-                                            },
-                                        },
-                                    }}
-                                />
-                            </FormControl>
-                        </LocalizationProvider>
+                        <FormControl fullWidth sx={{
+                            flexDirection: 'column',
+                        }}>
+                            <Typography sx={{ fontSize: '14px', fontWeight: 'bold' }}>
+                                Ngày tổ chức
+                            </Typography>
+                            <TextField
+                                fullWidth
+                                value={formatDate(form.date)}
+                                disabled={true} />
+                        </FormControl>
 
                         <FormControl fullWidth sx={{
                             display: 'flex',
@@ -255,59 +169,10 @@ export default function PartyForm({
                             <Typography sx={{ fontSize: '14px', fontWeight: 'bold' }}>
                                 Ca
                             </Typography>
-                            <Select
+                            <TextField
+                                fullWidth
                                 value={form.shift}
-                                onChange={(e) => setForm({ ...form, shift: e.target.value })}
-                                displayEmpty
-                            disabled={readOnly}
-                                sx={{
-                                    height: '61px',
-                                    "& .MuiSelect-icon": {
-                                        color: "var(--text-color)",
-                                    },
-                                }}
-                                MenuProps={{
-                                    PaperProps: {
-                                        sx: {
-                                            boxSizing: 'border-box',
-                                            padding: "0 8px",
-                                            border: "1px solid #e4e4e7",
-                                            "& .MuiMenuItem-root": {
-                                                borderRadius: "6px",
-                                                "&:hover": {
-                                                    backgroundColor: "rgba(117, 126, 136, 0.08)",
-                                                },
-                                                "&.Mui-selected": {
-                                                    backgroundColor: "#bcd7ff",
-                                                },
-                                            },
-                                        },
-                                    },
-                                }}
-                            >
-                                <MenuItem value="" disabled>
-                                    Chọn ca     {/* placeholder */}
-                                </MenuItem>
-                                {["Trưa", "Tối"].map((item) =>
-                                    <MenuItem value={item}
-                                        sx={{
-                                        }}
-                                    >
-                                        <Box sx={{
-                                            display: 'inline-flex',
-                                            paddingX: 1.5,
-                                            paddingY: 0.5,
-                                            borderRadius: 2,
-                                            backgroundColor: defaultBgColorMap[item],
-                                            color: defaultTextColorMap[item],
-                                            fontWeight: 'bold',
-                                            zIndex: 100
-                                        }}>
-                                            {item}
-                                        </Box>
-                                    </MenuItem>
-                                )}
-                            </Select>
+                                disabled={true} />
                         </FormControl>
 
                         <FormControl fullWidth sx={{
@@ -317,58 +182,10 @@ export default function PartyForm({
                             <Typography sx={{ fontSize: '14px', fontWeight: 'bold' }}>
                                 Sảnh
                             </Typography>
-                            <Select
-                                value={form.hall}
-                                onChange={(e) => setForm({ ...form, hall: e.target.value })}
-                                displayEmpty
-                            disabled={readOnly}
-                                sx={{
-                                    height: '61px',
-                                    "& .MuiSelect-icon": {
-                                        color: "var(--text-color)",
-                                    },
-                                }}
-                                MenuProps={{
-                                    PaperProps: {
-                                        sx: {
-                                            boxSizing: 'border-box',
-                                            padding: "0 8px",
-                                            border: "1px solid #e4e4e7",
-                                            "& .MuiMenuItem-root": {
-                                                borderRadius: "6px",
-                                                "&:hover": {
-                                                    backgroundColor: "rgba(117, 126, 136, 0.08)",
-                                                },
-                                                "&.Mui-selected": {
-                                                    backgroundColor: "#bcd7ff",
-                                                },
-                                            },
-                                        },
-                                    },
-                                }}
-                            >
-                                <MenuItem value="" disabled>
-                                    Chọn sảnh     {/* placeholder */}
-                                </MenuItem>
-                                {["A", "B", "C", "D", "E"].map((item) => (
-                                    <MenuItem value={item}
-                                        sx={{
-                                        }}
-                                    >
-                                        <Box sx={{
-                                            display: 'inline-flex',
-                                            paddingX: 1.5,
-                                            paddingY: 0.5,
-                                            borderRadius: 2,
-                                            backgroundColor: defaultBgColorMap[item],
-                                            color: defaultTextColorMap[item],
-                                            fontWeight: 'bold',
-                                        }}>
-                                            {item}
-                                        </Box>
-                                    </MenuItem>
-                                ))}
-                            </Select>
+                            <TextField
+                                fullWidth
+                                value={hallName}
+                                disabled={true} />
                         </FormControl>
                     </Box>
 
@@ -381,7 +198,7 @@ export default function PartyForm({
                         </Typography>
                         <TextField fullWidth value={form.deposit}
                             placeholder="Nhập tiền cọc"
-                           disabled={readOnly}
+                            disabled={true}
                             onChange={(e) => setForm({ ...form, deposit: Number(e.target.value) })} />
                     </Box>
 
@@ -394,7 +211,7 @@ export default function PartyForm({
                         </Typography>
                         <TextField fullWidth value={form.tables}
                             placeholder="Nhập số lượng bàn"
-                            disabled={readOnly}
+                            disabled={true}
                             onChange={(e) => setForm({ ...form, tables: Number(e.target.value) })} />
                     </Box>
 
@@ -407,47 +224,47 @@ export default function PartyForm({
                         </Typography>
                         <TextField fullWidth value={form.reserveTables}
                             placeholder="Nhập số bàn dự trữ"
-                            disabled={readOnly}
+                            disabled={true}
                             onChange={(e) => setForm({ ...form, reserveTables: Number(e.target.value) })} />
                     </Box>
                     <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-  <Typography sx={{ fontSize: '14px', fontWeight: 'bold' }}>
-    Trạng thái
-  </Typography>
-  <Select
-    value={form.status}
-    onChange={(e) => setForm({ ...form, status: e.target.value })}
-    disabled={readOnly}
-    sx={{
-      height: '61px',
-      "& .MuiSelect-icon": {
-        color: "var(--text-color)",
-      },
-    }}
-    MenuProps={{
-      PaperProps: {
-        sx: {
-          boxSizing: 'border-box',
-          padding: "0 8px",
-          border: "1px solid #e4e4e7",
-          "& .MuiMenuItem-root": {
-            borderRadius: "6px",
-            "&:hover": {
-              backgroundColor: "rgba(117, 126, 136, 0.08)",
-            },
-            "&.Mui-selected": {
-              backgroundColor: "#bcd7ff",
-            },
-          },
-        },
-      },
-    }}
-  >
-    <MenuItem value="Đã đặt cọc">Đã đặt cọc</MenuItem>
-    <MenuItem value="Đã thanh toán">Đã thanh toán</MenuItem>
-    <MenuItem value="Đã huỷ">Đã huỷ</MenuItem>
-  </Select>
-</Box>
+                        <Typography sx={{ fontSize: '14px', fontWeight: 'bold' }}>
+                            Trạng thái
+                        </Typography>
+                        <Select
+                            value={form.status}
+                            onChange={(e) => setForm({ ...form, status: e.target.value })}
+                            disabled={readOnly}
+                            sx={{
+                                height: '61px',
+                                "& .MuiSelect-icon": {
+                                    color: "var(--text-color)",
+                                },
+                            }}
+                            MenuProps={{
+                                PaperProps: {
+                                    sx: {
+                                        boxSizing: 'border-box',
+                                        padding: "0 8px",
+                                        border: "1px solid #e4e4e7",
+                                        "& .MuiMenuItem-root": {
+                                            borderRadius: "6px",
+                                            "&:hover": {
+                                                backgroundColor: "rgba(117, 126, 136, 0.08)",
+                                            },
+                                            "&.Mui-selected": {
+                                                backgroundColor: "#bcd7ff",
+                                            },
+                                        },
+                                    },
+                                },
+                            }}
+                        >
+                            <MenuItem value="Đã đặt cọc">Đã đặt cọc</MenuItem>
+                            <MenuItem value="Đã thanh toán">Đã thanh toán</MenuItem>
+                            <MenuItem value="Đã huỷ">Đã huỷ</MenuItem>
+                        </Select>
+                    </Box>
 
                 </Box>
             </DialogContent>

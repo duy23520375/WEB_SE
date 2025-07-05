@@ -16,7 +16,6 @@ import {
 import IconButton from '@mui/material/IconButton';
 import { Box } from '@mui/material';
 import { useAuth } from '../../auth/AuthContext';
-import { RoleBasedRender } from '../RoleBasedRender';
 
 export default function Sidebar() {
   const [expanded, setExpanded] = useState(true);
@@ -33,7 +32,7 @@ export default function Sidebar() {
     { path: 'bao-cao', icon: <ChartArea size={26} />, label: 'Báo cáo', roles: ['Admin'] },
     { path: 'cai-dat', icon: <Settings size={26} />, label: 'Cài đặt', roles: ['Admin'] },
   ];
-  
+
   const menuItems = rawMenuItems.filter(item =>
     !item.roles || (role !== null && item.roles.includes(role))
   );

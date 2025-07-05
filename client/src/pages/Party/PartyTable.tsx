@@ -14,6 +14,8 @@ import { EditOutlined, DeleteOutline, } from "@mui/icons-material";
 import { IParty } from "../../interfaces/party.interface";
 import { defaultBgColorMap, defaultTextColorMap } from "../../assets/color/ColorMap";
 import dayjs from "dayjs";
+import { RoleBasedRender } from "../../components/RoleBasedRender";
+import { Eye } from "lucide-react";
 
 
 type PartyKey = keyof IParty;
@@ -21,13 +23,15 @@ type PartyKey = keyof IParty;
 export default function PartyTable({
     data,
     searchKey,
+    handleRead,
     handleEdit,
     handleDelete,
     halls,
 }: {
     data: IParty[],
     searchKey: string,
-    handleEdit: (course: any) => void,
+    handleRead: (party: any, hallName: string) => void,
+    handleEdit: (party: any, hallName: string) => void,
     handleDelete: (id: any) => void,
     halls: any[], // Nhận thêm prop halls
 }) {
@@ -57,7 +61,7 @@ export default function PartyTable({
         return 0;
     });
     
-    
+
     return (
         <TableContainer
             sx={{
@@ -76,23 +80,7 @@ export default function PartyTable({
                             }
                         }}
                     >
-                        <TableCell align="center" onClick={() => handleRequestSort('id')}>
-                            <TableSortLabel
-                                active={orderBy === 'id'}
-                                direction={orderBy === 'id' ? order : 'asc'}
-                                sx={{
-                                    display: 'inline-flex',
-                                    justifyContent: 'center',
-                                    '& .MuiTableSortLabel-icon': {
-                                        margin: 0,
-                                        position: 'absolute',
-                                        right: '-20px',
-                                    }
-                                }}
-                            >
-                                <b>Mã tiệc cưới</b>
-                            </TableSortLabel>
-                        </TableCell>
+                        <TableCell align="center"><b>Stt</b></TableCell>
 
                         <TableCell align="center" onClick={() => handleRequestSort('groom')}>
                             <TableSortLabel
@@ -280,27 +268,26 @@ export default function PartyTable({
                 </TableHead>
                 
                 <TableBody>
-                    {sortedParties.map((party) => {
-                        // Debug: xem dữ liệu hall
+                    {sortedParties.map((party, index) => {
+                        const hallObj = halls.find(h => String(h._id) === String(party.hall));
+                        const tenSanh = hallObj ? hallObj.TENSANH : party.hall;
 
                         return (
-                            <TableRow key={party.id} hover>
-                                {/* ID */}
+                            <TableRow key={index} hover>
+                                {/* STT */}
                                 <TableCell
                                     align="center"
                                     sx={{
-                                        color: "var(--text-color)",
                                         width: "4%",
                                         fontWeight: 'bold',
                                     }}
                                 >
-                                    {party.code}
+                                    {index + 1}
                                 </TableCell>
 
                                 {/* Groom */}
                                 <TableCell
                                     sx={{
-                                        color: "var(--text-color)",
                                         maxWidth: { xs: 80, md: 120, },
                                         whiteSpace: 'nowrap',
                                         overflow: 'hidden',
@@ -314,7 +301,6 @@ export default function PartyTable({
                                 {/* Bride */}
                                 <TableCell
                                     sx={{
-                                        color: "var(--text-color)",
                                         maxWidth: { xs: 80, md: 120, },
                                         whiteSpace: 'nowrap',
                                         overflow: 'hidden',
@@ -329,7 +315,6 @@ export default function PartyTable({
                                 <TableCell
                                     align="center"
                                     sx={{
-                                        color: "var(--text-color)",
                                         width: "10%",
                                     }}
                                     title={party.phone}
@@ -341,7 +326,6 @@ export default function PartyTable({
                                 <TableCell
                                     align="center"
                                     sx={{
-                                        color: "var(--text-color)",
                                         width: "10%",
                                     }}
                                 >
@@ -370,42 +354,19 @@ export default function PartyTable({
                                     </Box>
                                 </TableCell>
 
-                                {/* Hall - loại sảnh */}
-                                <TableCell align="center" sx={{ width: "5%" }}>
-  {(() => {
-    const hallObj = halls.find(h => String(h._id) === String(party.hall));
-    const loaiSanh = hallObj ? hallObj.LOAISANH : party.hall;
-    console.log("hallObj:", hallObj);
-    console.log("party.hall:", party.hall);
-    console.log("Danh sách halls:", halls);
-    console.log("hallObj tìm được:", hallObj);
-    console.log("LOAISANH:", hallObj?.LOAISANH);
-    console.log("Các _id của halls:", halls.map(h => h._id));
-
-    return (
-      <Box
-        sx={{
-          display: 'inline-flex',
-          paddingX: 1.5,
-          paddingY: 0.5,
-          borderRadius: 2,
-          fontWeight: 'bold',
-          backgroundColor: defaultBgColorMap[loaiSanh],   // Sửa ở đây
-          color: defaultTextColorMap[loaiSanh],           // Và ở đây
-        }}
-      >
-        {loaiSanh}
-      </Box>
-    );
-  })()}
-</TableCell>
+                                {/* Hall */}
+                                <TableCell
+                                    align="center"
+                                    sx={{ width: "10%" }}
+                                >
+                                    {tenSanh}
+                                </TableCell>
 
 
                                 {/* Deposit */}
                                 <TableCell
                                     align="center"
                                     sx={{
-                                        color: "var(--text-color)",
                                         width: "10%",
                                     }}
                                 >
@@ -416,8 +377,7 @@ export default function PartyTable({
                                 <TableCell
                                     align="center"
                                     sx={{
-                                        color: "var(--text-color)",
-                                        width: "10%",
+                                        width: "7%",
                                     }}
                                 >
                                     {party.tables}
@@ -427,7 +387,6 @@ export default function PartyTable({
                                 <TableCell
                                     align="center"
                                     sx={{
-                                        color: "var(--text-color)",
                                         width: "7%",
                                     }}
                                 >
@@ -460,18 +419,28 @@ export default function PartyTable({
                                 <TableCell
                                     align="center"
                                     sx={{
-                                        width: "5%",
+                                        width: "10%",
                                         padding: 0,
                                     }}
                                 >
-                                    <IconButton size="small" sx={{ color: '#00d4ff' }}
-                                        onClick={() => handleEdit(party)}>
-                                        <EditOutlined fontSize="small" />
+                                    <IconButton size="small" sx={{ color: '#00b69b' }}
+                                        onClick={() => handleRead(party, tenSanh)}>
+                                        <Eye fontSize="small" />
                                     </IconButton>
-                                    <IconButton size="small" sx={{ color: '#ff0000' }}
-                                        onClick={() => handleDelete(party.id)}>
-                                        <DeleteOutline fontSize="small" />
-                                    </IconButton>
+
+                                    <RoleBasedRender allow="NhanVien">
+                                        <IconButton size="small" sx={{ color: '#00d4ff' }}
+                                            onClick={() => handleEdit(party, tenSanh)}>
+                                            <EditOutlined fontSize="small" />
+                                        </IconButton>
+                                    </RoleBasedRender>
+
+                                    <RoleBasedRender allow="NhanVien">
+                                        <IconButton size="small" sx={{ color: '#ff0000' }}
+                                            onClick={() => handleDelete(party.id)}>
+                                            <DeleteOutline fontSize="small" />
+                                        </IconButton>
+                                    </RoleBasedRender>
                                 </TableCell>
                             </TableRow>
                         );

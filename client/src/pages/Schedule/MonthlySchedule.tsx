@@ -139,7 +139,7 @@ export default function MonthlySchedule({
                                     <Box
                                         key={party.id}
                                         sx={{
-                                            backgroundColor: defaultBgColorMap[party.hall],
+                                            backgroundColor: defaultBgColorMap[party.shift],
                                             padding: '0px 4px',
                                             borderRadius: '3px',
                                             cursor: 'pointer',
@@ -151,7 +151,7 @@ export default function MonthlySchedule({
                                         }}
                                         onClick={() => onViewPartyDetail(party)}
                                     >
-                                        {party.shift} - Sảnh {party.hall}
+                                        {party.shift} - {party.hall}
                                     </Box>
                                 ))}
 

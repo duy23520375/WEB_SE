@@ -94,7 +94,7 @@ export default function WeeklySchedule({
                                         borderRadius: '10px',
                                         padding: '10px',
                                         cursor: 'pointer',
-                                        backgroundColor: defaultBgColorMap[party.hall],
+                                        backgroundColor: defaultBgColorMap[party.shift],
                                     }}
                                     onClick={() => onViewPartyDetail(party)}
                                 >
@@ -102,7 +102,7 @@ export default function WeeklySchedule({
                                         {`${party.groom} & ${party.bride}`}
                                     </Typography>
                                     <Typography variant="caption">
-                                        {`${party.shift} - Sảnh ${party.hall}`}
+                                        {`${party.shift} - ${party.hall}`}
                                     </Typography>
                                 </Box>
                             ))

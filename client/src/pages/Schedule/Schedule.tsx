@@ -16,49 +16,50 @@ export default function Schedule() {
 
 
   const [initialData, setInitialData] = useState<IParty[]>([]);
-// 1. State mới để giữ danh sách halls:
-const [halls, setHalls] = useState<{ _id: string; LOAISANH: string }[]>([]);
+  // 1. State mới để giữ danh sách halls:
+  const [halls, setHalls] = useState<{ _id: string; LOAISANH: string }[]>([]);
 
-// 2. Khi component mount, fetch cả hai cùng lúc:
-useEffect(() => {
-  async function loadAll() {
-    // fetch}sanh và tieccuoi song song
-    const [hRes, pRes] = await Promise.all([
-      fetch("http://localhost:3000/api/sanh"),
-      fetch("http://localhost:3000/api/tieccuoi"),
-    ]);
-    const hallsJson   = await hRes.json() as any[];           // mỗi phần tử có _id, LOAISANH, TENSANH…
-    const partiesJson = await pRes.json() as any[];           // phần tiệc cưới
+  // 2. Khi component mount, fetch cả hai cùng lúc:
+  useEffect(() => {
+    async function loadAll() {
+      // fetch}sanh và tieccuoi song song
+      const [hRes, pRes] = await Promise.all([
+        fetch("http://localhost:3000/api/sanh"),
+        fetch("http://localhost:3000/api/tieccuoi"),
+      ]);
+      const hallsJson = await hRes.json() as any[];           // mỗi phần tử có _id, LOAISANH, TENSANH…
+      const partiesJson = await pRes.json() as any[];           // phần tiệc cưới
 
-    const filtered = partiesJson.filter(item => item.TRANGTHAI !== 'Đã huỷ');
+      const filtered = partiesJson.filter(item => item.TRANGTHAI !== 'Đã huỷ');
 
 
-    setHalls(hallsJson);
+      setHalls(hallsJson);
 
-    // 3. Map partiesJson thành IParty, ánh xạ MASANH -> LOAISANH
-    const mapped: IParty[] = filtered.map(item => {
-      // tìm hall doc có _id === item.MASANH
-      const hallDoc = hallsJson.find(h => h._id === item.MASANH);
-      return {
-        id:             item._id,
-        groom:          item.TENCR,
-        bride:          item.TENCD,
-        phone:          item.SDT,
-        date:           item.NGAYDAI,
-        shift:          item.CA,
-        // gán hall bằng LOAISANH, hoặc fallback về chính item.MASANH nếu không tìm thấy
-        hall:           hallDoc?.LOAISANH ?? item.MASANH,
-        deposit:        item.TIENCOC,
-        tables:         item.SOLUONGBAN,
-        reserveTables:  item.SOBANDT,
-        status:         item.TRANGTHAI
-      };
-    });
+      // 3. Map partiesJson thành IParty, ánh xạ MASANH -> LOAISANH
+      const mapped: IParty[] = filtered.map(item => {
+        // tìm hall doc có _id === item.MASANH
+        const hallDoc = hallsJson.find(h => h._id === item.MASANH);
+        return {
+          code: item.code,
+          id: item._id,
+          groom: item.TENCR,
+          bride: item.TENCD,
+          phone: item.SDT,
+          date: item.NGAYDAI,
+          shift: item.CA,
+          // gán hall bằng TENSANH, hoặc fallback về chính item.MASANH nếu không tìm thấy
+          hall: hallDoc?.TENSANH ?? item.TENSANH,
+          deposit: item.TIENCOC,
+          tables: item.SOLUONGBAN,
+          reserveTables: item.SOBANDT,
+          status: item.TRANGTHAI
+        };
+      });
 
-    setInitialData(mapped);
-  }
-  loadAll();
-}, []);
+      setInitialData(mapped);
+    }
+    loadAll();
+  }, []);
 
 
   const [viewMode, setViewMode] = useState<'tuan' | 'thang'>(view || 'tuan');
@@ -77,7 +78,7 @@ useEffect(() => {
   useEffect(() => {
     setTempDate(currentDate);
   }, [currentDate]);
-  
+
   const handleChangeViewMode = (
     event: React.MouseEvent<HTMLElement>,
     newView: 'tuan' | 'thang' | null
@@ -206,21 +207,6 @@ useEffect(() => {
               }}
               slotProps={{
                 actionBar: { style: { display: 'none' } },
-                day: {
-                  sx: {
-                    color: "#8f9091",
-                    borderRadius: '10px',
-                    '&:hover': {
-                      backgroundColor: '#e3f2fd',
-                    },
-                    '&.MuiPickersDay-root.Mui-selected': {
-                      backgroundColor: '#4880FF',
-                      '&:hover': {
-                        backgroundColor: '#3578f0'
-                      }
-                    },
-                  },
-                },
               }}
             />
             <Button variant="contained" onClick={() => handleCloseCalendar(true)}
@@ -303,6 +289,7 @@ useEffect(() => {
         onExportBill={() => { }}
         initialData={detailData}
         readOnly={true}
+        hallName={detailData?.hall || ""}
       />
     </Box>
   );

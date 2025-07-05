@@ -33,8 +33,8 @@ function getServiceImage(name: string) {
     return "https://via.placeholder.com/400x220?text=No+Image";
 }
 
-const NullService = {
-    id: '',
+const NullService: IService = {
+    _id: '',
     name: "",
     description: "",
     price: 0,
@@ -74,10 +74,10 @@ export default function StepService() {
 
     const handleSelectService = (service: IService) => {
         setSelectedServices((prev) => {
-            if (prev.some(item => item.serviceId === service.id)) return prev;
+            if (prev.some(item => item.serviceId === service._id)) return prev;
             return [...prev, {
                 ...service,
-                serviceId: service.id,
+                serviceId: service._id,
                 quantity: 1,
                 note: "",
             }];
@@ -127,7 +127,7 @@ export default function StepService() {
                 }}>
                     {filteredServices.map((service) => (
                         <Card
-                            key={service.id}
+                            key={service._id}
                             onClick={() => { handleSelectService(service) }}
                             sx={{
                                 display: 'flex',
@@ -135,10 +135,10 @@ export default function StepService() {
                                 borderRadius: 3,
                                 cursor: "pointer",
                                 border:
-                                    selectedServices.some(s => s.serviceId === service.id)
+                                    selectedServices.some(s => s.serviceId === service._id)
                                         ? "3px solid #4880FF"
                                         : "1px solid #ccc",
-                                boxShadow: selectedServices.some(s => s.serviceId === service.id) ? 4 : 1,
+                                boxShadow: selectedServices.some(s => s.serviceId === service._id) ? 4 : 1,
                             }}
                         >
                             <CardMedia

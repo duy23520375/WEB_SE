@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Service as ServiceType } from './serviceData';
 import './Service.css';
 // import { IService } from '../../interfaces/service.interface';
-import { Button, Dialog,Typography, DialogTitle, DialogContent, DialogActions, TextField, FormControl, InputLabel, Select, MenuItem, Box } from '@mui/material';
+import { Button, Typography, Box } from '@mui/material';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -12,6 +12,8 @@ import ConfirmDelete from '../../components/Alert/ConfirmDelete/ConfirmDelete';
 import ServiceDetailMenu from '../../components/Menu/ServiceDetailMenu';
 import PetalAnimation from '../../components/Animations/PetalAnimation';
 import SearchBar from '../../components/SearchBar';
+import { RoleBasedRender } from '../../components/RoleBasedRender.tsx';
+import { IService } from '../../interfaces/service.interface.ts';
 function getServiceImage(service: ServiceType) {
     const ten = service.name ? service.name.toLowerCase() : '';
     if (ten.includes('trang trí sảnh tiệc')) return 'https://nhahanghuonglieusunflower.com/wp-content/uploads/2023/06/Trang-tri-sanh-tiec-cuoi-1.jpg';
@@ -21,7 +23,7 @@ function getServiceImage(service: ServiceType) {
     if (ten.includes('ca sĩ hát live')) return 'https://tse2.mm.bing.net/th/id/OIP.RJBQRtjbja59537YUUsmegHaE7?rs=1&pid=ImgDetMain';
     if (ten.includes('ban nhạc sống')) return 'https://tse3.mm.bing.net/th/id/OIP.kM2F15lLcH9e4RdqCzMDnwHaE7?rs=1&pid=ImgDetMain';
     if (ten.includes('quay phim chuyên nghiệp')) return 'https://tse4.mm.bing.net/th/id/OIP.gx2kWyON409-DaK5YOpORAHaEi?rs=1&pid=ImgDetMain';
-    if (ten.includes('chụp ảnh cưới')) return 'https://toplist.vn/images/800px/ah-studio-692689.jpg';    
+    if (ten.includes('chụp ảnh cưới')) return 'https://toplist.vn/images/800px/ah-studio-692689.jpg';
     if (ten.includes('trang điểm cô dâu')) return 'https://th.bing.com/th/id/R.1b26497fc5b8d280cef2e540e1f58639?rik=NcCaAEts4QRg0Q&pid=ImgRaw&r=0';
     if (ten.includes('làm tóc cô dâu')) return 'https://erocante.vn/wp-content/uploads/2021/01/kieu-toc-cho-co-dau-mat-dai.jpg';
     if (ten.includes('áo dài cưới')) return 'https://th.bing.com/th/id/R.e1c951e3746adb79924709cf649c2f39?rik=xKA8HSRnShOAZg&pid=ImgRaw&r=0';
@@ -81,68 +83,68 @@ export default function Service() {
             });
     }, []);
     const filteredServices = selectedCategory === 'Tất cả'
-    ? services
-    : services.filter(service => service.category === selectedCategory);
+        ? services
+        : services.filter(service => service.category === selectedCategory);
 
     const handleOpenAddServiceDialog = () => {
         setOpenAddServiceDialog(true);
     };
     const handleAddService = (data: any) => {
-    fetch('http://localhost:3000/api/dichvu', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            TENDICHVU: data.name,
-            GHICHU: data.description,
-            DONGIA: data.price,
-            DANHMUC: data.category,
-        }),
-    })
-    .then(res => res.json())
-    .then(newService => {
-        setServices(prev => [
-            ...prev,
-            {
-                _id: newService._id,
-                name: newService.TENDICHVU,
-                description: newService.GHICHU,
-                price: newService.DONGIA,
-                category: newService.DANHMUC,
-            }
-        ]);
-    });
-};
+        fetch('http://localhost:3000/api/dichvu', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                TENDICHVU: data.name,
+                GHICHU: data.description,
+                DONGIA: data.price,
+                DANHMUC: data.category,
+            }),
+        })
+            .then(res => res.json())
+            .then(newService => {
+                setServices(prev => [
+                    ...prev,
+                    {
+                        _id: newService._id,
+                        name: newService.TENDICHVU,
+                        description: newService.GHICHU,
+                        price: newService.DONGIA,
+                        category: newService.DANHMUC,
+                    }
+                ]);
+            });
+    };
     const handleCloseAddServiceDialog = () => {
         setOpenAddServiceDialog(false);
     };
     const handleEditService = (updatedService: ServiceType) => {
-    fetch(`http://localhost:3000/api/dichvu/${updatedService._id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            TENDICHVU: updatedService.name,
-            GHICHU: updatedService.description,
-            DONGIA: updatedService.price,
-            DANHMUC: updatedService.category,
-        }),
-    })
-    .then(res => res.json())
-    .then(newService => setServices(prev =>
-        prev.map(s => s._id === updatedService._id
-            ? {
-                _id: updatedService._id,
-                name: newService.TENDICHVU,
-                description: newService.GHICHU,
-                price: newService.DONGIA,
-                category: newService.DANHMUC,
-                image: getServiceImage({ name: newService.TENDICHVU })
-            }
-            : s
-        )
-    ));
-    setOpenEditServiceDialog(false);
-    setServiceToEdit(null);
-};
+        fetch(`http://localhost:3000/api/dichvu/${updatedService._id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                TENDICHVU: updatedService.name,
+                GHICHU: updatedService.description,
+                DONGIA: updatedService.price,
+                DANHMUC: updatedService.category,
+            }),
+        })
+            .then(res => res.json())
+            .then(newService => setServices(prev =>
+                prev.map(s => s._id === updatedService._id
+                    ? {
+                        _id: updatedService._id,
+                        name: newService.TENDICHVU,
+                        description: newService.GHICHU,
+                        price: newService.DONGIA,
+                        category: newService.DANHMUC,
+                        image: getServiceImage(newService.TENDICHVU)
+                    }
+                    : s
+                )
+            ));
+        setOpenEditServiceDialog(false);
+        setServiceToEdit(null);
+    };
     const handleEditClick = (service: ServiceType) => {
         setServiceToEdit(service);
         setOpenEditServiceDialog(true);
@@ -164,195 +166,206 @@ export default function Service() {
     };
 
     const handleConfirmDelete = () => {
-    if (!serviceToDelete) return;
-    fetch(`http://localhost:3000/api/dichvu/${serviceToDelete._id}`, {
-        method: 'DELETE',
-    })
-    .then(res => {
-        if (res.ok) setServices(prev => prev.filter(s => s._id !== serviceToDelete._id));
-        setOpenDeleteDialog(false);
-        setServiceToDelete(null);
-    });
-};
+        if (!serviceToDelete) return;
+        fetch(`http://localhost:3000/api/dichvu/${serviceToDelete._id}`, {
+            method: 'DELETE',
+        })
+            .then(res => {
+                if (res.ok) setServices(prev => prev.filter(s => s._id !== serviceToDelete._id));
+                setOpenDeleteDialog(false);
+                setServiceToDelete(null);
+            });
+    };
 
     return (
         <Box sx={{ background: '#f5f6fa', minHeight: '100vh', p: 0, position: 'relative', overflow: 'hidden' }}>
 
             <Box sx={{ background: 'rgba(255, 255, 255, 0.5)', backdropFilter: 'blur(2px)', borderRadius: 3, p: 3, boxShadow: '0 4px 24px rgba(0,0,0,0.04)', maxWidth: 1400, mx: 'auto', width: '100%', position: 'relative', zIndex: 1 }}>
                 <Box sx={{ height: '100vh', overflowY: 'auto', pr: 2 }}>
-        <div className="service-container">
-            <PetalAnimation />
-                    <Typography
-                        sx={{
-                            userSelect: "none",
-                            color: "var(--text-color)",
-                            fontWeight: "bold",
-                            fontSize: "32px",
-                            marginBottom: "20px",
-                            textAlign: 'left',
-                        }}
-                    >
-                        Dịch Vụ Đám Cưới
-                    </Typography>
-                                        <Box sx={{ display: 'flex', gap: 2, marginBottom: '20px', alignItems: 'center', justifyContent: 'flex-end' }}>
-                        <SearchBar
-                            value={searchKey}
-                            onChange={e => setSearchKey(e.target.value)}
+                    <div className="service-container">
+                        <PetalAnimation />
+                        <Typography
                             sx={{
-                                height: '48px',
-                                '& .MuiInputBase-root': {
-                                    height: '48px',
-                                    fontSize: '15px',
-                                    borderRadius: '10px',
-                                },
+                                userSelect: "none",
+                                color: "var(--text-color)",
+                                fontWeight: "bold",
+                                fontSize: "32px",
+                                marginBottom: "20px",
+                                textAlign: 'left',
                             }}
-                        />
-                <Button
-                    variant="contained"
-                    startIcon={<AddCircleOutlineIcon />}
-                    sx={{
-                        whiteSpace: 'nowrap',
-                        borderRadius: '50px',
-                        backgroundColor: '#4880FF',
-                        '&:hover': {
-                            backgroundColor: '#3a66cc',
-                            boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)',
-                        },
-                    }}
-                    onClick={handleOpenAddServiceDialog}
-                >
-                    Thêm dịch vụ
-                </Button>
-                </Box>
+                        >
+                            Dịch Vụ Đám Cưới
+                        </Typography>
 
-            
-            <div className="category-filter">
-                {categories.map(category => (
-                    <button
-                        key={category}
-                        className={`category-btn ${selectedCategory === category ? 'active' : ''}`}
-                        onClick={() => setSelectedCategory(category)}
-                    >
-                        {category}
-                    </button>
-                ))}
-            </div>
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                marginBottom: "20px",
+                                marginX: "20px",
+                            }}
+                        >
+                            <Box sx={{
+                                display: 'flex',
+                                width: "40%",
+                            }}>
+                                <SearchBar
+                                    value={searchKey}
+                                    onChange={e => setSearchKey(e.target.value)} />
+                            </Box>
 
-            <div className="service-grid" style={{
-                display: 'flex',
-                flexWrap: 'wrap',
-                gap: 24,
-                justifyContent: 'flex-start',
-            }}>
-                {filteredServices.map((service: ServiceType) => (
-                    <div key={service._id} className="service-card" style={{
-                        flex: '0 1 calc(25% - 18px)',
-                        minWidth: '240px',
-                        maxWidth: '1fr',
-                        position: 'relative',
-                        cursor: 'pointer', 
-                    }}
-
-                    onClick={() => handleServiceClick(service)}
+                            <RoleBasedRender allow="Admin">
+                                <Button
+                                    variant="contained"
+                                    startIcon={<AddCircleOutlineIcon />}
+                                    sx={{
+                                        alignSelf: 'flex-end',
+                                        padding: '10px 30px',
+                                        fontSize: "14px",
+                                        fontWeight: "bold",
+                                        borderRadius: '8px',
+                                        backgroundColor: '#4880FF',
+                                        '&:hover': {
+                                            backgroundColor: "#3578f0",
+                                            boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)',
+                                        },
+                                        textTransform: "none",
+                                    }}
+                                    onClick={handleAddService}
+                                >
+                                    Thêm dịch vụ
+                                </Button>
+                            </RoleBasedRender>
+                        </Box>
 
 
-                    >
-                        <div style={{
-                            position: 'absolute',
-                            top: 8,
-                            right: 8,
+                        <div className="category-filter">
+                            {categories.map(category => (
+                                <button
+                                    key={category}
+                                    className={`category-btn ${selectedCategory === category ? 'active' : ''}`}
+                                    onClick={() => setSelectedCategory(category)}
+                                >
+                                    {category}
+                                </button>
+                            ))}
+                        </div>
+
+                        <div className="service-grid" style={{
                             display: 'flex',
-                            gap: 8,
-                            zIndex: 2
+                            flexWrap: 'wrap',
+                            gap: 24,
+                            justifyContent: 'flex-start',
                         }}>
-                            <Button size="small" sx={{ minWidth: 0, p: 0.5 }}   
-                            onClick={(e) => {
-                                            e.stopPropagation();       
-                                            handleEditClick(service);
+                            {filteredServices.map((service: ServiceType) => (
+                                <div key={service._id} className="service-card" style={{
+                                    flex: '0 1 calc(25% - 18px)',
+                                    minWidth: '240px',
+                                    maxWidth: '1fr',
+                                    position: 'relative',
+                                    cursor: 'pointer',
+                                }}
+                                    onClick={() => handleServiceClick(service)}
+                                >
+                                    <RoleBasedRender allow="Admin">
+                                        <div style={{
+                                            position: 'absolute',
+                                            top: 8,
+                                            right: 8,
+                                            display: 'flex',
+                                            gap: 8,
+                                            zIndex: 2
                                         }}>
-                                <Box
-                                    sx={{
-                                        bgcolor: '#fff',
-                                        borderRadius: '50%',
-                                        p: '4px',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-                                        transition: 'background 0.2s, box-shadow 0.2s',
-                                        cursor: 'pointer',
-                                        '&:hover': {
-                                            bgcolor: '#f0f0f0',
-                                            boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
-                                            '& .MuiSvgIcon-root': { opacity: 1 }
-                                        }
-                                    }}
-                                >
-                                    <EditIcon fontSize="small" sx={{ color: '#00e1ff', opacity: 0.85, transition: 'opacity 0.2s' }} />
-                                </Box>
-                            </Button>
-                            <Button size="small" sx={{ minWidth: 0, p: 0.5 }}   
-                            onClick={(e) => {
-                                                                    e.stopPropagation();
-                                                                    handleDeleteClick(service);
-                                                                }}>
-                                <Box
-                                    sx={{
-                                        bgcolor: '#fff',
-                                        borderRadius: '50%',
-                                        p: '4px',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-                                        transition: 'background 0.2s, box-shadow 0.2s',
-                                        cursor: 'pointer',
-                                        '&:hover': {
-                                            bgcolor: '#f0f0f0',
-                                            boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
-                                            '& .MuiSvgIcon-root': { opacity: 1 }
-                                        }
-                                    }}
-                                >
-                                    <DeleteIcon fontSize="small" sx={{ color: '#ff0000', opacity: 0.85, transition: 'opacity 0.2s' }} />
-                                </Box>
-                            </Button>
+                                            <Button size="small" sx={{ minWidth: 0, p: 0.5 }}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleEditClick(service);
+                                                }}>
+                                                <Box
+                                                    sx={{
+                                                        bgcolor: '#fff',
+                                                        borderRadius: '50%',
+                                                        p: '4px',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                                                        transition: 'background 0.2s, box-shadow 0.2s',
+                                                        cursor: 'pointer',
+                                                        '&:hover': {
+                                                            bgcolor: '#f0f0f0',
+                                                            boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
+                                                            '& .MuiSvgIcon-root': { opacity: 1 }
+                                                        }
+                                                    }}
+                                                >
+                                                    <EditIcon fontSize="small" sx={{ color: '#00e1ff', opacity: 0.85, transition: 'opacity 0.2s' }} />
+                                                </Box>
+                                            </Button>
+                                            <Button size="small" sx={{ minWidth: 0, p: 0.5 }}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleDeleteClick(service);
+                                                }}>
+                                                <Box
+                                                    sx={{
+                                                        bgcolor: '#fff',
+                                                        borderRadius: '50%',
+                                                        p: '4px',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                                                        transition: 'background 0.2s, box-shadow 0.2s',
+                                                        cursor: 'pointer',
+                                                        '&:hover': {
+                                                            bgcolor: '#f0f0f0',
+                                                            boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
+                                                            '& .MuiSvgIcon-root': { opacity: 1 }
+                                                        }
+                                                    }}
+                                                >
+                                                    <DeleteIcon fontSize="small" sx={{ color: '#ff0000', opacity: 0.85, transition: 'opacity 0.2s' }} />
+                                                </Box>
+                                            </Button>
+                                        </div>
+                                    </RoleBasedRender>
+                                    <img src={service.image} alt={service.name} className="service-image" />                        <div className="service-info">
+                                        <h3>{service.name}</h3>
+                                        <p>{service.description}</p>
+                                        <p className="service-price">{service.price.toLocaleString('vi-VN')} VNĐ</p>
+                                    </div>
+                                </div>
+                            ))}
                         </div>
-                        <img src={service.image}  alt={service.name} className="service-image" />                        <div className="service-info">
-                            <h3>{service.name}</h3>
-                            <p>{service.description}</p>
-                            <p className="service-price">{service.price.toLocaleString('vi-VN')} VNĐ</p>
-                        </div>
-                    </div>
-                ))}
-            </div>
 
-            <ServiceAddDialog
-                open={openAddServiceDialog}
-                onClose={handleCloseAddServiceDialog}
-                onSave={handleAddService} // <-- truyền hàm này vào đây
-                categories={categories}
-            />
-            <ServiceEditDialog
-                open={openEditServiceDialog}
-                onClose={handleCloseEditDialog}
-                service={serviceToEdit}
-                categories={categories}
-                onSave={handleEditService}
-            />
-            <ConfirmDelete
-                open={openDeleteDialog}
-                onClose={handleCloseDeleteDialog}
-                onConfirm={handleConfirmDelete}
-            />
-            {selectedService && (
-                <ServiceDetailMenu
-                    open={detailDialogOpen}
-                    onClose={handleCloseDetailDialog}
-                    initialData={selectedService}
-                />
-            )}
-        </div>
+                        <ServiceAddDialog
+                            open={openAddServiceDialog}
+                            onClose={handleCloseAddServiceDialog}
+                            onSave={handleAddService} // <-- truyền hàm này vào đây
+                            categories={categories}
+                        />
+                        <ServiceEditDialog
+                            open={openEditServiceDialog}
+                            onClose={handleCloseEditDialog}
+                            service={serviceToEdit}
+                            categories={categories}
+                            onSave={handleEditService}
+                        />
+                        <ConfirmDelete
+                            open={openDeleteDialog}
+                            onClose={handleCloseDeleteDialog}
+                            onConfirm={handleConfirmDelete}
+                        />
+                        {selectedService && (
+                            <ServiceDetailMenu
+                                open={detailDialogOpen}
+                                onClose={handleCloseDetailDialog}
+                                initialData={selectedService}
+                            />
+                        )}
+                    </div>
                 </Box>
             </Box>
         </Box>
