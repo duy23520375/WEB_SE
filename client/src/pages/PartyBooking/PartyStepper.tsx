@@ -204,7 +204,7 @@ export default function PartyStepper() {
             </Button>
           ) : (
             <Button
-              type="submit"
+            type="submit"
               variant="contained"
               sx={{
                 fontSize: "14px",
@@ -215,7 +215,7 @@ export default function PartyStepper() {
               }}
               onClick={handleSubmit(onSubmit)}
             >
-              Đặt tiệc
+              Xác nhận
             </Button>
           )}
         </Box>
