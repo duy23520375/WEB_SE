@@ -288,6 +288,9 @@ export default function Food() {
                 setFoodToDelete(null);
             });
     };
+    const handleOpenAddDialog = () => {
+        setAddDialogOpen(true);
+    };
 
     const handleDeleteCancel = () => {
         setDeleteDialogOpen(false);
@@ -369,7 +372,7 @@ export default function Food() {
                                         },
                                         textTransform: "none",
                                     }}
-                                    onClick={handleAddFood}
+                                    onClick={handleOpenAddDialog}
                                 >
                                     Thêm món ăn
                                 </Button>
