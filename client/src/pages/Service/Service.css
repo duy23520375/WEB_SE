@@ -33,10 +33,9 @@
 }
 
 .category-btn.active {
-    background-color: #ff4d4d;
+    background-color: #4880FF;
     color: white;
 }
-
 .service-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
