@@ -82,9 +82,11 @@ export default function Service() {
                 setServices(mapped);
             });
     }, []);
-    const filteredServices = selectedCategory === 'Tất cả'
-        ? services
-        : services.filter(service => service.category === selectedCategory);
+    const filteredServices = services.filter(service => {
+        const matchesCategory = selectedCategory === 'Tất cả' || service.category === selectedCategory;
+        const matchesSearch = service.name.toLowerCase().includes(searchKey.toLowerCase());
+        return matchesCategory && matchesSearch;
+    });
 
     const handleOpenAddServiceDialog = () => {
         setOpenAddServiceDialog(true);
@@ -196,43 +198,44 @@ export default function Service() {
                         >
                             Dịch Vụ Đám Cưới
                         </Typography>
+                            <Box sx={{ display: 'flex', gap: 2, marginBottom: '20px', alignItems: 'center', justifyContent: 'flex-end' }}>
 
-                        <Box
+                        <SearchBar
+                            value={searchKey}
+                            onChange={e => setSearchKey(e.target.value)}
                             sx={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'space-between',
-                                marginBottom: "20px",
-                                marginX: "20px",
+                                height: '48px',
+                                '& .MuiInputBase-root': {
+                                    height: '48px',
+                                    fontSize: '15px',
+                                    borderRadius: '10px',
+                                },
                             }}
-                        >
-                            <Box sx={{
-                                display: 'flex',
-                                width: "40%",
-                            }}>
-                                <SearchBar
-                                    value={searchKey}
-                                    onChange={e => setSearchKey(e.target.value)} />
-                            </Box>
-
+                        />
+            
                             <RoleBasedRender allow="Admin">
                                 <Button
                                     variant="contained"
                                     startIcon={<AddCircleOutlineIcon />}
-                                    sx={{
-                                        alignSelf: 'flex-end',
-                                        padding: '10px 30px',
-                                        fontSize: "14px",
-                                        fontWeight: "bold",
-                                        borderRadius: '8px',
-                                        backgroundColor: '#4880FF',
-                                        '&:hover': {
-                                            backgroundColor: "#3578f0",
-                                            boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)',
-                                        },
-                                        textTransform: "none",
-                                    }}
-                                    onClick={handleAddService}
+                            sx={{
+                                height: '48px',
+                                padding: '0 20px',
+                                borderRadius: '10px',
+                                minWidth: 'unset',
+                                fontSize: '15px',
+                                boxShadow: 'none',
+                                lineHeight: 1.2,
+                                display: 'flex',
+                                alignItems: 'center',
+                                backgroundColor: '#4880FF !important',
+                                color: '#fff',
+                                filter: 'none',
+                                opacity: 1,
+                                '&:hover': {
+                                    backgroundColor: '#3578f0 !important',
+                                },
+                            }}
+                                    onClick={handleOpenAddServiceDialog}
                                 >
                                     Thêm dịch vụ
                                 </Button>
