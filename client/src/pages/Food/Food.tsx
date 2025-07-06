@@ -184,10 +184,11 @@ export default function Food() {
             })
             .catch(err => console.error(err));
     }, []);
-    const filteredFoods = selectedCategory === 'Tất cả'
-        ? foods
-        : foods.filter(food => food.category === selectedCategory);
-
+    const filteredFoods = foods.filter(food => {
+        const matchesCategory = selectedCategory === 'Tất cả' || food.category === selectedCategory;
+        const matchesSearch = food.name.toLowerCase().includes(searchKey.toLowerCase());
+        return matchesCategory && matchesSearch;
+    });
     const handleCloseAddDialog = () => {
         setAddDialogOpen(false);
     };
@@ -336,42 +337,44 @@ export default function Food() {
                         >
                             Danh Sách Món Ăn
                         </Typography>
+<Box sx={{ display: 'flex', gap: 2, marginBottom: '20px', alignItems: 'center', justifyContent: 'flex-end' }}>
 
-                        <Box
-                            sx={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'space-between',
-                                marginBottom: "20px",
-                                marginX: "20px",
-                            }}
-                        >
-                            <Box sx={{
-                                display: 'flex',
-                                width: "40%",
-                            }}>
-                                <SearchBar
-                                    value={searchKey}
-                                    onChange={e => setSearchKey(e.target.value)} />
-                            </Box>
+                          <SearchBar
+                                value={searchKey}
+                                onChange={e => setSearchKey(e.target.value)}
+                                sx={{
+                                    height: '48px',
+                                    '& .MuiInputBase-root': {
+                                        height: '48px',
+                                        fontSize: '15px',
+                                        borderRadius: '10px',
+                                    },
+                                }}
+                            />
+
 
                             <RoleBasedRender allow="Admin">
                                 <Button
                                     variant="contained"
                                     startIcon={<AddCircleOutlineIcon />}
-                                    sx={{
-                                        alignSelf: 'flex-end',
-                                        padding: '10px 30px',
-                                        fontSize: "14px",
-                                        fontWeight: "bold",
-                                        borderRadius: '8px',
-                                        backgroundColor: '#4880FF',
-                                        '&:hover': {
-                                            backgroundColor: "#3578f0",
-                                            boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)',
-                                        },
-                                        textTransform: "none",
-                                    }}
+                                sx={{
+                                    height: '48px',
+                                    padding: '0 20px',
+                                    borderRadius: '10px',
+                                    minWidth: 'unset',
+                                    fontSize: '15px',
+                                    boxShadow: 'none',
+                                    lineHeight: 1.2,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    backgroundColor: '#4880FF !important',
+                                    color: '#fff',
+                                    filter: 'none',
+                                    opacity: 1,
+                                    '&:hover': {
+                                        backgroundColor: '#3578f0 !important',
+                                    },
+                                }}
                                     onClick={handleOpenAddDialog}
                                 >
                                     Thêm món ăn
