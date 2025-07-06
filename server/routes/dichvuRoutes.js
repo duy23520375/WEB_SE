@@ -1,12 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const Monan = require('./../models/Monan')
+const Dichvu = require('./../models/Dichvu')
 
 router.post('/', async (req, res) => {
   try {
     const data = req.body;
-    const newMonan = new Monan(data);
-    const response = await newMonan.save();
+    const newDichvu = new Dichvu(data);
+    const response = await newDichvu.save();
     console.log('Data saved');
     res.status(200).json(response); 
   } catch (err) {
@@ -17,7 +17,7 @@ router.post('/', async (req, res) => {
 
 router.get('/', async (req, res) => {
   try {
-    const data = await Monan.find(); 
+    const data = await Dichvu.find(); 
     console.log('Data fetched');
     res.status(200).json(data); 
   } catch (err) {
@@ -28,15 +28,15 @@ router.get('/', async (req, res) => {
 
 router.put('/:id', async (req,res)=> {
   try {
-    const monanId = req.params.id;
-    const updatedMonanData = req.body;
+    const dichvuId = req.params.id;
+    const updatedDichvuData = req.body;
 
-    const response = await Monan.findByIdAndUpdate(monanId, updatedMonanData,{
+    const response = await Dichvu.findByIdAndUpdate(dichvuId, updatedDichvuData,{
       new: true,
       runValidators: true
     })
     if (!response) {
-      return res.status(404).json({error: 'Món ăn not found'})
+      return res.status(404).json({error: 'Dịch vụ not found'})
     }
     console.log('data updated')
     res.status(200).json(response)
@@ -48,11 +48,10 @@ router.put('/:id', async (req,res)=> {
 
 router.delete('/:id', async (req,res)=> {
   try {
-    const monanId = req.params.id;
-    console.log("BE nhận được _id:", monanId);
-    const response = await Monan.findByIdAndDelete(monanId)
+    const dichvuId = req.params.id;
+    const response = await Dichvu.findByIdAndDelete(dichvuId)
     if (!response) {
-      return res.status(404).json({error: 'Món ăn not found'})
+      return res.status(404).json({error: 'Dịch vụ not found'})
     }
     console.log('data delete')
     res.status(200).json({message: 'deleted successfully'})
