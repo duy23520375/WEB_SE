@@ -9,6 +9,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import HallDetailMenu from "../../../components/Menu/HallDetailMenu";
 
+
 // Hàm gán ảnh minh họa dựa vào tên sảnh
 import hallA1Image from "../../../assets/ảnh 1.webp";
 import hallA2Image from "../../../assets/ảnh 2.webp";
@@ -58,11 +59,41 @@ const NullHall = {
 };
 
 export default function StepHall() {
-    const { watch, setValue, control, register, formState: { errors } } = useFormContext();
+    const { watch, setValue, control, register, formState: { errors } ,setError, clearErrors} = useFormContext();
     const [searchKey, setSearchKey] = useState("");
     const [isDetailMenuOpen, setIsDetailMenuOpen] = useState(false);
     const [halls, setHalls] = useState<any[]>([]);
+    const [bookedHallIds, setBookedHallIds] = useState<string[]>([]);
 
+
+    const selectedDate = watch("date");
+    const selectedShift = watch("shift");
+        
+      // Kiểm tra nếu ngày và ca đã được chọn
+      
+useEffect(() => {
+  if (selectedDate && selectedShift) {
+    fetch("http://localhost:3000/api/tieccuoi")
+      .then(r => r.json())
+      .then((list: any[]) => {
+        console.log("Tất cả tiệc:", list);
+        // chỉ lấy những tiệc có cùng ngày & ca
+        const booked = list
+          .filter(x => dayjs(x.NGAYDAI).format("YYYY-MM-DD") === dayjs(selectedDate).format("YYYY-MM-DD") && x.CA === selectedShift)
+          .map(x => x.MASANH);
+
+    
+        console.log(
+          `Booked halls on ${selectedDate} (${selectedShift}):`,
+          booked
+        );
+        setBookedHallIds(booked);
+      });
+  } else {
+    setBookedHallIds([]);
+  }
+}, [selectedDate, selectedShift]);
+  
     // Fetch halls từ backend và gán ảnh minh họa ở FE
     useEffect(() => {
         fetch("http://localhost:3000/api/sanh")
@@ -81,8 +112,7 @@ export default function StepHall() {
     const tables = Number(watch("tables") || 0);
     const reserveTables = Number(watch("reserveTables") || 0);
     const totalTables = (tables + reserveTables) || 0;
-    const selectedDate = watch("date");
-    const selectedShift = watch("shift");
+
     const selectedHall = watch("hall") || NullHall;
 
     const filteredHalls = halls.filter((hall) => {
@@ -128,10 +158,25 @@ export default function StepHall() {
                         columnGap: { sm: '3%', md: '2%' },
                         padding: '3px'
                     }}>
-                        {filteredHalls.map((hall) => (
+                        {filteredHalls.map(hall => {
+                            const isBooked = bookedHallIds.includes(hall.id);
+                            return (
                             <Card
                                 key={hall.id}
-                                onClick={() => field.onChange(hall)} 
+                                onClick={ () => {
+                                                    if (isBooked) {
+                    setError("hall", {
+                      type: "manual",
+                      message: "Sảnh này đã được đặt, vui lòng chọn sảnh khác",
+                    }); 
+                
+                } else{
+
+clearErrors("hall");
+                                    field.onChange(hall);
+                    }
+
+                } }
                                 sx={{
                                     borderRadius: 3,
                                     cursor: "pointer",
@@ -218,7 +263,8 @@ export default function StepHall() {
                                     </Box>
                                 </CardContent>
                             </Card>
-                        ))}
+                            )
+                        })}
                     </Box>
                 </Box>
             ) :(

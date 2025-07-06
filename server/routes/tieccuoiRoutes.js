@@ -73,16 +73,23 @@ router.put('/:id', async (req, res) => {
 
     // ✅ Nếu trạng thái là "Đã thanh toán"
     if (updatedTieccuoiData.TRANGTHAI === 'Đã thanh toán') {
-      const isLate = new Date(updatedTieccuoiData.NGAYDAI) < new Date();
+      const eventDate = new Date(updatedTieccuoiData.NGAYDAI);
+      const today = new Date();
+      // Tính số ngày trễ (làm tròn lên)
+      const msPerDay = 1000 * 60 * 60 * 24;
+      const daysLate = Math.max(0, Math.ceil((today - eventDate) / msPerDay));
+
       const tienCoc = updated.TIENCOC;
-      const tienPhaiTra = isLate ? tienCoc * 10 * 1.01 : tienCoc * 10;
+      // Gốc là 10x tiền cọc, sau đó cộng phạt % theo số ngày trễ
+      const multiplier = 1 + (daysLate-1) / 100;
+      const tienPhaiTra = tienCoc * 10 * multiplier;
 
       await Hoadon.findOneAndUpdate(
         { MATIEC: updated.MATIEC },
         { $set: { TONGTIEN: tienPhaiTra } }
       );
 
-      console.log(`Hóa đơn đã cập nhật (${isLate ? 'trễ hạn' : 'đúng hạn'})`);
+      console.log(`Hóa đơn đã cập nhật (${daysLate} ngày trễ -> phạt ${daysLate}%)`);
     }
 
     res.status(200).json(updated);
@@ -94,20 +101,27 @@ router.put('/:id', async (req, res) => {
 
 
 
-
-router.delete('/:id', async (req,res)=> {
+router.delete('/:id', async (req, res) => {
   try {
-    const tieccuoiId = req.params.id;
-    const response = await Tieccuoi.findByIdAndDelete(tieccuoiId)
-    if (!response) {
-      return res.status(404).json({error: 'Tiệc cưới not found'})
+    // 1) Xoá tiệc cưới và lấy về document vừa bị xoá
+    const deletedParty = await Tieccuoi.findByIdAndDelete(req.params.id);
+    if (!deletedParty) {
+      return res.status(404).json({ error: 'Tiệc cưới không tồn tại' });
     }
-    console.log('data delete')
-    res.status(200).json({message: 'deleted successfully'})
-  }catch (err) {
-    console.log(err);
-    res.status(500).json({ error: 'Internal Server Error', details: err.message }); 
-  }
-})
+    console.log(`Đã xoá tiệc cưới ${deletedParty.MATIEC}`);
 
+    // 2) Xoá luôn hoá đơn liên quan
+    await Hoadon.deleteMany({ MATIEC: deletedParty.MATIEC });
+    console.log(`Đã xoá tất cả hoá đơn của tiệc ${deletedParty.MATIEC}`);
+
+    // 3) Trả về kết quả
+    return res.status(200).json({ message: 'Xoá thành công tiệc cưới và hoá đơn liên quan' });
+  } catch (err) {
+    console.error('Lỗi khi xoá:', err);
+    return res.status(500).json({
+      error: 'Internal Server Error',
+      details: err.message
+    });
+  }
+});
 module.exports = router

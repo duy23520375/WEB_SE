@@ -427,7 +427,7 @@ export default function PartyPage() {
                         TENCD: data.bride,
                         SDT: data.phone,
                         CA: data.shift,
-                        _id: data.hall,
+                        MASANH: data.hall,
                         NGAYDAI: data.date,
                         TIENCOC: data.deposit,
                         SOLUONGBAN: data.tables,
@@ -440,7 +440,8 @@ export default function PartyPage() {
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify(payload),
                     })
-                        .then((res) => {
+                        .then(  (res) => {
+
                             if (!res.ok) throw new Error("Sửa thất bại");
                             return res.json();
                         })

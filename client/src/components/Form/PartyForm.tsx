@@ -231,6 +231,7 @@ export default function PartyForm({
                         <Typography sx={{ fontSize: '14px', fontWeight: 'bold' }}>
                             Trạng thái
                         </Typography>
+                        {(!readOnly && form.status === 'Đã đặt cọc') ? ( 
                         <Select
                             value={form.status}
                             onChange={(e) => setForm({ ...form, status: e.target.value })}
@@ -264,6 +265,14 @@ export default function PartyForm({
                             <MenuItem value="Đã thanh toán">Đã thanh toán</MenuItem>
                             <MenuItem value="Đã huỷ">Đã huỷ</MenuItem>
                         </Select>
+
+                        ) : (
+
+                        // Khi đã ở “Đã thanh toán” hoặc “Đã huỷ”, hoặc đang xem readOnly
+                        <Typography sx={{ lineHeight: '61px' }}>
+                        {form.status}
+                        </Typography>
+                    )}                           
                     </Box>
 
                 </Box>
