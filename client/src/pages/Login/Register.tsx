@@ -5,12 +5,13 @@ import {
     Box,
     Typography,
     Container,
-    Link,
     IconButton,
     InputAdornment,
     Alert,
     SelectChangeEvent, // Thêm SelectChangeEvent vào đây
 } from '@mui/material';
+import { Link } from 'react-router-dom';
+
 const RegisterPage: React.FC = () => {
     const [registerData, setRegisterData] = useState({
         fullName: '',
@@ -62,41 +63,41 @@ const RegisterPage: React.FC = () => {
             setRegisterError('Mật khẩu phải có ít nhất 6 ký tự');
             return false;
         }
+
         
-    
         return true;
     };
 
     const handleSubmitRegister = async () => {
-            setRegisterError('');
-            if (validateRegisterData()) {
-                try {
-                    const res = await fetch('http://localhost:3000/api/taikhoan', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            TenDangNhap: registerData.phoneNumber,  // Đúng với schema
-                            MatKhau: registerData.password,
-                            HoTen: registerData.fullName,
-                            LoaiTK: 'NhanVien' // hoặc cho phép chọn giữa 'Admin' và 'NhanVien'
-                            }),
-                    });
+        setRegisterError('');
+        if (validateRegisterData()) {
+            try {
+                const res = await fetch('http://localhost:3000/api/taikhoan', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        TenDangNhap: registerData.phoneNumber,  // Đúng với schema
+                        MatKhau: registerData.password,
+                        HoTen: registerData.fullName,
+                        LoaiTK: 'NhanVien' // hoặc cho phép chọn giữa 'Admin' và 'NhanVien'
+                    }),
+                });
 
-                    const data = await res.json();
-                    if (!res.ok) {
-                        setRegisterError(data.message || 'Đăng ký thất bại');
-                    } else {
-                        alert('Đăng ký thành công');
-                        window.location.href = '/login'; // hoặc dùng navigate nếu dùng react-router
-                    }
-                } catch (error) {
-                    console.error('Lỗi đăng ký:', error);
-                    setRegisterError('Không thể kết nối đến máy chủ');
+                const data = await res.json();
+                if (!res.ok) {
+                    setRegisterError(data.message || 'Đăng ký thất bại');
+                } else {
+                    alert('Đăng ký thành công');
+                    window.location.href = '/login'; // hoặc dùng navigate nếu dùng react-router
                 }
+            } catch (error) {
+                console.error('Lỗi đăng ký:', error);
+                setRegisterError('Không thể kết nối đến máy chủ');
             }
-        };
+        }
+    };
 
 
     return (
@@ -181,17 +182,11 @@ const RegisterPage: React.FC = () => {
                     >
                         Đăng Ký
                     </Button>
-                    <Box sx={{ textAlign: 'center', mt: 2 }}>
+                    <Box sx={{ justifyContent: 'center', gap: '10px', display: 'flex' }}>
                         Đã có tài khoản?
-                        <Link href="/login" variant="body2" sx={{ color: '#4880FF' }}>
+                        <Link to="/login">
                             Đăng Nhập
                         </Link>
-                    </Box>
-                    <Box sx={{ textAlign: 'center', mt: 2 }}>
-                        <Typography variant="body2" color="textSecondary">
-                            Bằng việc tiếp tục đăng ký, bạn đã đồng ý với 
-                            <Link href="#" sx={{ color: '#4880FF', ml: 0.5 }}>Điều khoản và Chính sách quyền riêng tư</Link> của chúng tôi
-                        </Typography>
                     </Box>
                 </Box>
             </Box>

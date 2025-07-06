@@ -23,13 +23,6 @@ export default function StepConfirm() {
     setLoading(true);
     setSuccess(false);
     const data = getValues();
-    // Tìm maxTable của sảnh đã chọn
-    let maxTable = 0;
-    if (data.hall && data.hall.maxTable) {
-        maxTable = data.hall.maxTable;
-    } else if (data.hall && data.hall.SOLUONGBANTD) {
-        maxTable = data.hall.SOLUONGBANTD;
-    }
     
     console.log("Dữ liệu gửi lên backend:", {
         TENCR: data.groom,
@@ -54,7 +47,7 @@ export default function StepConfirm() {
                 NGAYDAI: data.date,
                 CA: data.shift,
                 SOLUONGBAN: data.tables,
-                SOBANDT: reserveTables, // cập nhật đúng số bàn dự trữ
+                SOBANDT: data.reserveTables, // cập nhật đúng số bàn dự trữ
                 TIENCOC: totalBill * 0.1,
                 foods: data.foods,
                 services: data.services,

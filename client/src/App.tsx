@@ -1,5 +1,5 @@
 import './App.css';
-import { BrowserRouter, useNavigate } from "react-router-dom";
+import { BrowserRouter, useLocation, useNavigate } from "react-router-dom";
 import Sidebar from './components/Sidebar/Sidebar';
 import AppRoutes from "./routes/AppRoutes.tsx";
 import { ThemeProvider, CssBaseline, CircularProgress } from "@mui/material";
@@ -29,12 +29,13 @@ function MainLayout() {
 function LayoutWrapper() {
   const { role, isInitialized } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   if (!isInitialized) {
     return <CircularProgress />
   }
 
-  if (!role) {
+  if (!role && !location.pathname.includes('register')) {
     navigate("/login");
   }
 

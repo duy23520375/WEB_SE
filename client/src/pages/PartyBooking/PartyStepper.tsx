@@ -204,6 +204,7 @@ export default function PartyStepper() {
             </Button>
           ) : (
             <Button
+              type="submit"
               variant="contained"
               sx={{
                 fontSize: "14px",

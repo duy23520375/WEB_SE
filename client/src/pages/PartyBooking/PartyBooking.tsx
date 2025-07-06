@@ -10,10 +10,10 @@ export default function PartyBooking() {
             date: "",
             shift: "",
             hall: "",
-            tables: "",
-            reserveTables: "",
-            foods: "",
-            services: "",
+            tables: "0",
+            reserveTables: "0",
+            foods: [],
+            services: [],
         },
         mode: "onTouched", // để trigger validate chính xác
     });

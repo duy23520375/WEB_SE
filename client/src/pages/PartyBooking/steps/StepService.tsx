@@ -54,7 +54,7 @@ export default function StepService() {
         fetch("http://localhost:3000/api/dichvu")
             .then(res => res.json())
             .then(data => setServices(data.map((item: any) => ({
-                id: item._id,
+                _id: item._id,
                 name: item.TENDICHVU,
                 description: item.GHICHU,
                 price: item.DONGIA,

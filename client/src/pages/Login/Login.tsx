@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { TextField, Button, Box, Typography, Container, Link, IconButton, InputAdornment } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { TextField, Button, Box, Typography, Container, IconButton, InputAdornment } from '@mui/material';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthContext';
 
 const LoginPage: React.FC = () => {
@@ -12,11 +12,11 @@ const LoginPage: React.FC = () => {
     const [phoneError, setPhoneError] = useState('');
     const [passwordError, setPasswordError] = useState('');
     const navigate = useNavigate();
-    const { login } = useAuth();
+    const { login, role } = useAuth();
 
     const validateForm = () => {
         let isValid = true;
-        
+
         if (!phoneNumber.trim()) {
             setPhoneError('Vui lòng nhập số điện thoại');
             isValid = false;
@@ -33,6 +33,12 @@ const LoginPage: React.FC = () => {
 
         return isValid;
     };
+
+    useEffect(() => {
+        if (role) {
+            navigate("/sanh-tiec");
+        }
+    }, [role]);
 
     const handleLogin = async () => {
         if (validateForm()) {
@@ -55,9 +61,6 @@ const LoginPage: React.FC = () => {
                     // Ví dụ: lưu username và role vào localStorage
                     localStorage.setItem('username', data.username);
                     login(data.role);
-                    
-                    // Điều hướng đến trang sảnh tiệc sau khi đăng nhập
-                    navigate('/sanh-tiec');
                 } else {
                     console.error('Lỗi đăng nhập:', data.message);
                     setPasswordError(data.message || 'Sai tài khoản hoặc mật khẩu');
@@ -170,13 +173,10 @@ const LoginPage: React.FC = () => {
                     >
                         Đăng Nhập
                     </Button>
-                    <Box sx={{ textAlign: 'center' }}>
+                    <Box sx={{ justifyContent: 'center', gap: '10px', display: 'flex' }}>
                         Bạn chưa có tài khoản?
                         <Link
-                            component="button"
-                            variant="body2"
-                            onClick={() => navigate('/register')}
-                            sx={{ color: '#4880FF' }}
+                            to={'/register'}
                         >
                             Đăng ký
                         </Link>
