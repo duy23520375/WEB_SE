@@ -10,11 +10,13 @@ dayjs.extend(isToday);
 export default function MonthlySchedule({
     currentMonth,
     partyData,
-    onViewPartyDetail
+    onViewPartyDetail,
+    onDateSeeAll
 }: {
     currentMonth: dayjs.Dayjs,
     partyData: IParty[],
     onViewPartyDetail: (party: any) => void,
+    onDateSeeAll: (partyList: any, date: string) => void
 }) {
     const monthStart = currentMonth.startOf("month");
     const calendarStart = monthStart.startOf('week')
@@ -167,6 +169,7 @@ export default function MonthlySchedule({
                                                 backgroundColor: '#ddd'
                                             }
                                         }}
+                                        onClick={() => onDateSeeAll(datePartys, date.toString())}
                                     >
                                         + {datePartys.length - maxParty}
                                     </Box>

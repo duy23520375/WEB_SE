@@ -115,7 +115,7 @@ export default function StepConfirm() {
                 
                 <Box sx={{ display: 'flex', gap: '10px', width: '30%' }}>
                     <Typography sx={{ fontSize: '16px', fontWeight: 'bold' }}>Sảnh:</Typography>
-                    <Typography sx={{ fontSize: '16px' }}>{watch("hall")?.type}</Typography>
+                    <Typography sx={{ fontSize: '16px' }}>{watch("hall")?.name}</Typography>
                 </Box>
                 <Box sx={{ display: 'flex', gap: '10px', width: '30%' }}>
                     <Typography sx={{ fontSize: '16px', fontWeight: 'bold' }}>Ngày đãi tiệc:</Typography>

@@ -9,6 +9,7 @@ import dayjs from "dayjs";
 import { useParams, useNavigate } from "react-router-dom";
 import { LocalizationProvider, StaticDatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import ScheduleForm from "../../components/Form/ScheduleForm";
 
 export default function Schedule() {
   const { view } = useParams<{ view: 'tuan' | 'thang' }>();
@@ -65,8 +66,11 @@ export default function Schedule() {
   const [viewMode, setViewMode] = useState<'tuan' | 'thang'>(view || 'tuan');
   const [currentDate, setCurrentDate] = useState(dayjs());
   const [tempDate, setTempDate] = useState(currentDate);
-  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isPartyFormOpen, setIsPartyFormOpen] = useState(false);
   const [detailData, setDetailData] = useState<IParty | null>(null);
+  const [isScheduleFormOpen, setIsScheduleFormOpen] = useState(false);
+  const [monthDate, setMonthDate] = useState(new Date().toDateString());
+  const [monthDatePartyList, setMonthDatePartyList] = useState<IParty[]>([]);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   useEffect(() => {
@@ -114,7 +118,13 @@ export default function Schedule() {
 
   const handleViewDetail = (party: IParty) => {
     setDetailData(party);
-    setIsFormOpen(true);
+    setIsPartyFormOpen(true);
+  };
+
+  const handleMonthDateSeeAll = (partyList: IParty[], date: string) => {
+    setMonthDatePartyList(partyList);
+    setMonthDate(date);
+    setIsScheduleFormOpen(true);
   };
 
   return (
@@ -277,19 +287,28 @@ export default function Schedule() {
             currentMonth={currentDate}
             partyData={initialData}
             onViewPartyDetail={handleViewDetail}
+            onDateSeeAll={handleMonthDateSeeAll}
           />
         )}
 
       </Box>
 
       <PartyForm
-        open={isFormOpen}
-        onClose={() => setIsFormOpen(false)}
+        open={isPartyFormOpen}
+        onClose={() => setIsPartyFormOpen(false)}
         onSubmit={() => { }}
         onExportBill={() => { }}
         initialData={detailData}
         readOnly={true}
         hallName={detailData?.hall || ""}
+      />
+
+      <ScheduleForm
+        open={isScheduleFormOpen}
+        onClose={() => setIsScheduleFormOpen(false)}
+        initialData={monthDatePartyList}
+        date={monthDate}
+        onViewPartyDetail={handleViewDetail}
       />
     </Box>
   );
