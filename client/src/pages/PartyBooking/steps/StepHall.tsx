@@ -91,11 +91,10 @@ export default function StepHall() {
             && matchesTables;
     });
 
-    useEffect(() => {
-        register("hall", { required: "Vui lòng chọn một sảnh" });
-        register("tables", { required: "Vui lòng nhập số bàn", valueAsNumber: true });
-        register("reserveTables", { required: true, valueAsNumber: true });
-    }, [register]);
+    // useEffect(() => {
+    //     register("hall", { required: "Vui lòng chọn một sảnh" });
+
+    // }, [register]);
 
     const onSelectHall = (hall: IHall) => {
         setValue("hall", hall, { shouldValidate: true });
@@ -105,7 +104,14 @@ export default function StepHall() {
         <Box sx={{
             display: 'flex', gap: '20px', height: '100%'
         }}>
-            {totalTables > 0 && selectedDate && selectedShift ?
+    
+        <Controller
+          name="hall"
+          control={control}
+          defaultValue={null}
+          rules={{ required: "Vui lòng chọn một sảnh" }}
+          render={({ field }) => (
+            totalTables > 0 && selectedDate && selectedShift ? (
                 <Box sx={{
                     flex: 1,
                     overflowY: 'auto',
@@ -125,7 +131,7 @@ export default function StepHall() {
                         {filteredHalls.map((hall) => (
                             <Card
                                 key={hall.id}
-                                onClick={() => onSelectHall(hall)}
+                                onClick={() => field.onChange(hall)} 
                                 sx={{
                                     borderRadius: 3,
                                     cursor: "pointer",
@@ -215,7 +221,8 @@ export default function StepHall() {
                         ))}
                     </Box>
                 </Box>
-                : <Typography sx={{
+            ) :(
+                 <Typography sx={{
                     display: 'flex',
                     flex: 1,
                     justifyContent: 'center',
@@ -224,8 +231,12 @@ export default function StepHall() {
                 }}>
                     Vui lòng nhập thông tin
                 </Typography>
-            }
-
+            
+            
+        )
+    )}
+    />
+ 
             <Box sx={{
                 display: 'flex',
                 flexDirection: 'column',
@@ -238,6 +249,12 @@ export default function StepHall() {
                     onChange={(e) => setSearchKey(e.target.value)}
                 />
 
+                <Controller
+                    name="tables"
+                    control={control}
+                    defaultValue=""
+                    rules={{ required: "Vui lòng nhập số bàn " }}
+                    render={({ field }) => (
                 <Box sx={{
                     display: 'flex',
                     justifyContent: 'space-between',
@@ -248,7 +265,6 @@ export default function StepHall() {
                     </Typography>
                     <TextField
                         type="number"
-                        {...register("tables", { valueAsNumber: true })}
                         error={!!errors.tables}
                         sx={{
                             width: '90px',
@@ -259,9 +275,19 @@ export default function StepHall() {
                                 padding: "8px 10px",
                             },
                         }}
+                                                        {...field}
+                                onChange={(e) => field.onChange(Number(e.target.value))}
                     />
                 </Box>
+                            )}
+                />
 
+                <Controller
+                    name="reserveTables"
+                    control={control}
+                    defaultValue=""
+                    rules={{ required: "Vui lòng nhập số bàn dự trữ" }}
+                    render={({ field }) => (
                 <Box sx={{
                     display: 'flex',
                     justifyContent: 'space-between',
@@ -272,7 +298,7 @@ export default function StepHall() {
                     </Typography>
                     <TextField
                         type="number"
-                        {...register("reserveTables", { valueAsNumber: true })}
+
                         error={!!errors.reserveTables}
                         sx={{
                             width: '90px',
@@ -283,8 +309,12 @@ export default function StepHall() {
                                 padding: "8px 10px",
                             },
                         }}
+                                                                               {...field}
+                                onChange={(e) => field.onChange(Number(e.target.value))}
                     />
                 </Box>
+                                            )}
+                />
                 <Controller
                     name="shift"
                     control={control}
@@ -446,6 +476,7 @@ export default function StepHall() {
                     </Typography>
                 )}
             </Box>
+            
 
             <HallDetailMenu
                 open={isDetailMenuOpen}
@@ -453,5 +484,6 @@ export default function StepHall() {
                 initialData={selectedHall}
             />
         </Box>
+        
     );
 }
