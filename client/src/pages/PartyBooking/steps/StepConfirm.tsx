@@ -30,7 +30,7 @@ export default function StepConfirm() {
     } else if (data.hall && data.hall.SOLUONGBANTD) {
         maxTable = data.hall.SOLUONGBANTD;
     }
-    const reserveTables = Math.max(0, maxTable - (data.tables || 0));
+    
     console.log("Dữ liệu gửi lên backend:", {
         TENCR: data.groom,
         TENCD: data.bride,
@@ -39,7 +39,7 @@ export default function StepConfirm() {
         NGAYDAI: data.date,
         CA: data.shift,
         SOLUONGBAN: data.tables,
-        SOBANDT: reserveTables, // cập nhật đúng số bàn dự trữ
+        SOBANDT: data.reserveTables, // cập nhật đúng số bàn dự trữ
         TIENCOC: totalBill * 0.1,
     });
     try {
@@ -151,7 +151,7 @@ export default function StepConfirm() {
                 </Box>
                 <Box sx={{ display: 'flex', gap: '10px', width: '30%' }}>
                     <Typography sx={{ fontSize: '16px', fontWeight: 'bold' }}>Số bàn dự trữ:</Typography>
-                    <Typography sx={{ fontSize: '16px' }}>{(() => { let maxTable = 0; const hall = watch("hall"); if (hall && hall.maxTable) { maxTable = hall.maxTable; } else if (hall && hall.SOLUONGBANTD) { maxTable = hall.SOLUONGBANTD; } return Math.max(0, maxTable - (watch("tables") || 0)); })()}</Typography>
+                    <Typography sx={{ fontSize: '16px' }}>{watch("reserveTables") || 0}</Typography>
                 </Box>
             </Box>
 

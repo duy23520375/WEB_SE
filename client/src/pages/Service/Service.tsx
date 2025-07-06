@@ -14,8 +14,8 @@ import PetalAnimation from '../../components/Animations/PetalAnimation';
 import SearchBar from '../../components/SearchBar';
 import { RoleBasedRender } from '../../components/RoleBasedRender.tsx';
 import { IService } from '../../interfaces/service.interface.ts';
-function getServiceImage(service: ServiceType) {
-    const ten = service.name ? service.name.toLowerCase() : '';
+function getServiceImage(service: string) {
+    const ten = service ? service.toLowerCase() : '';
     if (ten.includes('trang trí sảnh tiệc')) return 'https://nhahanghuonglieusunflower.com/wp-content/uploads/2023/06/Trang-tri-sanh-tiec-cuoi-1.jpg';
     if (ten.includes('trang trí bàn tiệc')) return 'https://cdn.tgdd.vn/2021/12/CookDishThumb/cach-trang-tri-ban-tiec-ngot-doc-dao-moi-la-ap-dung-duoc-cho-thumb-620x620.jpg';
     if (ten.includes('trang trí lễ đường')) return 'https://tse1.mm.bing.net/th/id/OIP.-puz0hvMSoSpr8ow03r1RwEyDM?rs=1&pid=ImgDetMain';
@@ -77,7 +77,7 @@ export default function Service() {
                     description: item.GHICHU,
                     price: item.DONGIA,
                     category: item.DANHMUC,
-                    image: getServiceImage({ name: item.TENDICHVU }),
+                    image: getServiceImage(item.TENDICHVU),
                 }));
                 setServices(mapped);
             });

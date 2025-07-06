@@ -41,7 +41,7 @@ function getFoodImage(name: string) {
 }
 
 const NullFood = {
-    id: '',
+    _id: '',
     name: "",
     description: "",
     price: 0,
@@ -50,7 +50,7 @@ const NullFood = {
 };
 
 export default function StepFood() {
-    const { watch, setValue } = useFormContext();
+    const { watch, setValue, formState: { errors }  } = useFormContext();
     const [searchKey, setSearchKey] = useState("");
     const [foodDetail, setFoodDetail] = useState(NullFood);
     const [isDetailMenuOpen, setIsDetailMenuOpen] = useState(false);
@@ -62,7 +62,7 @@ export default function StepFood() {
         fetch("http://localhost:3000/api/monan")
             .then(res => res.json())
             .then(data => setFoods(data.map((item: any) => ({
-                id: item._id,
+                _id: item._id,
                 name: item.TENMONAN,
                 description: item.GHICHU,
                 price: item.DONGIA,
@@ -85,10 +85,10 @@ export default function StepFood() {
 
     const handleSelectFood = (food: IFood) => {
         setSelectedFoods((prev) => {
-            if (prev.some(item => item.foodId === food.id)) return prev;
+            if (prev.some(item => item.foodId === food._id)) return prev;
             return [...prev, {
                 ...food,
-                foodId: food.id,
+                foodId: food._id,
                 note: ""
             }];
         });
@@ -129,7 +129,7 @@ export default function StepFood() {
                 }}>
                     {filteredFoods.map((food) => (
                         <Card
-                            key={food.id}
+                            key={food._id}
                             onClick={() => { handleSelectFood(food) }}
                             sx={{
                                 display: 'flex',
@@ -137,10 +137,10 @@ export default function StepFood() {
                                 borderRadius: 3,
                                 cursor: "pointer",
                                 border:
-                                    selectedFoods.some(f => f.foodId === food.id)
+                                    selectedFoods.some(f => f.foodId === food._id)
                                         ? "3px solid #4880FF"
                                         : "1px solid #ccc",
-                                boxShadow: selectedFoods.some(f => f.foodId === food.id) ? 4 : 1,
+                                boxShadow: selectedFoods.some(f => f.foodId === food._id) ? 4 : 1,
                             }}
                         >
                             <CardMedia
@@ -160,7 +160,7 @@ export default function StepFood() {
                                 flexGrow: 1
                             }}>
                                 <Typography
-                                    onClick={() => { 
+                                    onClick={() => {
                                         setFoodDetail(food);
                                         setIsDetailMenuOpen(true);
                                     }}
@@ -304,6 +304,13 @@ export default function StepFood() {
                     gap: '5px',
                     paddingY: '7px',
                 }}>
+
+                    {errors.foods && (
+                        <Typography color="error" fontSize="18px">
+                            {errors.foods.message}
+                        </Typography>
+                    )}
+
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <Typography sx={{
                             fontWeight: 'bold',

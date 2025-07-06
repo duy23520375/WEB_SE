@@ -25,6 +25,8 @@ import hallD3Image from "../../../assets/ảnh 12.jpg";
 import hallE1Image from "../../../assets/ảnh 13.jpg";
 import hallE2Image from "../../../assets/ảnh 14.jpeg";
 import hallE3Image from "../../../assets/ảnh 15.jpg";
+import { IHall } from "../../../interfaces/hall.interface";
+
 function getHallImage(tenSanh: string) {
     const ten = tenSanh.toLowerCase();
     if (ten.includes("grand ballroom a1")) return hallA1Image;
@@ -56,7 +58,7 @@ const NullHall = {
 };
 
 export default function StepHall() {
-    const { watch, setValue, control } = useFormContext();
+    const { watch, setValue, control, register, formState: { errors } } = useFormContext();
     const [searchKey, setSearchKey] = useState("");
     const [isDetailMenuOpen, setIsDetailMenuOpen] = useState(false);
     const [halls, setHalls] = useState<any[]>([]);
@@ -76,27 +78,34 @@ export default function StepHall() {
             }))));
     }, []);
 
-    const totalTables = (watch("tables") || 0) + (watch("reserveTables") || 0);
+    const tables = Number(watch("tables") || 0);
+    const reserveTables = Number(watch("reserveTables") || 0);
+    const totalTables = (tables + reserveTables) || 0;
     const selectedDate = watch("date");
     const selectedShift = watch("shift");
     const selectedHall = watch("hall") || NullHall;
-    const filterPrice = watch("filterPrice") || 0;
 
-
-    
     const filteredHalls = halls.filter((hall) => {
-    const matchesTables = hall.maxTable >= totalTables;
-    const matchesPrice = hall.minTablePrice >= filterPrice;
-    return hall.name.toLowerCase().includes(searchKey.toLowerCase())
-        && matchesTables
-        && matchesPrice;
-});
+        const matchesTables = hall.maxTable >= totalTables;
+        return hall.name.toLowerCase().includes(searchKey.toLowerCase())
+            && matchesTables;
+    });
+
+    useEffect(() => {
+        register("hall", { required: "Vui lòng chọn một sảnh" });
+        register("tables", { required: "Vui lòng nhập số bàn", valueAsNumber: true });
+        register("reserveTables", { required: true, valueAsNumber: true });
+    }, [register]);
+
+    const onSelectHall = (hall: IHall) => {
+        setValue("hall", hall, { shouldValidate: true });
+    };
 
     return (
         <Box sx={{
             display: 'flex', gap: '20px', height: '100%'
         }}>
-            {totalTables !== 0 && selectedDate && selectedShift ?
+            {totalTables > 0 && selectedDate && selectedShift ?
                 <Box sx={{
                     flex: 1,
                     overflowY: 'auto',
@@ -116,7 +125,7 @@ export default function StepHall() {
                         {filteredHalls.map((hall) => (
                             <Card
                                 key={hall.id}
-                                onClick={() => setValue("hall", hall)}
+                                onClick={() => onSelectHall(hall)}
                                 sx={{
                                     borderRadius: 3,
                                     cursor: "pointer",
@@ -229,68 +238,53 @@ export default function StepHall() {
                     onChange={(e) => setSearchKey(e.target.value)}
                 />
 
-                <Controller
-                    name="tables"
-                    control={control}
-                    defaultValue=""
-                    render={({ field }) => (
-                        <Box sx={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center'
-                        }}>
-                            <Typography sx={{ fontSize: '16px', fontWeight: 'bold' }}>
-                                Số lượng bàn:
-                            </Typography>
-                            <TextField
-                                type="number"
-                                sx={{
-                                    width: '90px',
-                                    "& fieldset": {
-                                        borderRadius: "10px",
-                                    },
-                                    "& .MuiInputBase-input": {
-                                        padding: "8px 10px",
-                                    },
-                                }}
-                                {...field}
-                                onChange={(e) => field.onChange(Number(e.target.value))}
-                            />
-                        </Box>
-                    )}
-                />
+                <Box sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center'
+                }}>
+                    <Typography sx={{ fontSize: '16px', fontWeight: 'bold' }}>
+                        Số lượng bàn:
+                    </Typography>
+                    <TextField
+                        type="number"
+                        {...register("tables", { valueAsNumber: true })}
+                        error={!!errors.tables}
+                        sx={{
+                            width: '90px',
+                            "& fieldset": {
+                                borderRadius: "10px",
+                            },
+                            "& .MuiInputBase-input": {
+                                padding: "8px 10px",
+                            },
+                        }}
+                    />
+                </Box>
 
-                <Controller
-                    name="filterPrice"
-                    control={control}
-                    defaultValue=""
-                    render={({ field }) => (
-                        <Box sx={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center'
-                        }}>
-                            <Typography sx={{ fontSize: '16px', fontWeight: 'bold' }}>
-                                Đơn giá bàn:
-                            </Typography>
-                            <TextField
-                                type="number"
-                                sx={{
-                                    width: '90px',
-                                    "& fieldset": {
-                                        borderRadius: "10px",
-                                    },
-                                    "& .MuiInputBase-input": {
-                                        padding: "8px 10px",
-                                    },
-                                }}
-                                {...field}
-
-                                onChange={(e) => field.onChange(Number(e.target.value))}
-                            />
-                        </Box>
-                    )}
-                />
+                <Box sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center'
+                }}>
+                    <Typography sx={{ fontSize: '16px', fontWeight: 'bold' }}>
+                        Số bàn dự trữ:
+                    </Typography>
+                    <TextField
+                        type="number"
+                        {...register("reserveTables", { valueAsNumber: true })}
+                        error={!!errors.reserveTables}
+                        sx={{
+                            width: '90px',
+                            "& fieldset": {
+                                borderRadius: "10px",
+                            },
+                            "& .MuiInputBase-input": {
+                                padding: "8px 10px",
+                            },
+                        }}
+                    />
+                </Box>
                 <Controller
                     name="shift"
                     control={control}
@@ -433,28 +427,24 @@ export default function StepHall() {
                                             },
 
                                         },
-                                        day: {
-                                            sx: {
-                                                color: "#8f9091",
-                                                borderRadius: '10px',
-                                                '&:hover': {
-                                                    backgroundColor: '#e3f2fd',
-                                                },
-                                                '&.MuiPickersDay-root.Mui-selected': {
-                                                    backgroundColor: '#4880FF',
-                                                    color: '#fff',
-                                                    '&:hover': {
-                                                        backgroundColor: '#4880FF'
-                                                    }
-                                                },
-                                            },
-                                        },
                                     }}
                                 />
                             </FormControl>
                         </LocalizationProvider>
                     )}
                 />
+
+                {errors.hall && (
+                    <Typography color="error" fontSize="18px">
+                        {errors.hall.message}
+                    </Typography>
+                )}
+
+                {(errors.tables || errors.reserveTables) && (
+                    <Typography color="error" fontSize="18px">
+                        {errors.tables?.message || errors.reserveTables?.message}
+                    </Typography>
+                )}
             </Box>
 
             <HallDetailMenu

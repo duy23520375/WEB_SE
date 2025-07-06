@@ -7,6 +7,7 @@ import StepService from "./steps/StepService";
 import StepConfirm from "./steps/StepConfirm";
 import { useFormContext } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
+import { IFoodBooking } from "../../interfaces/food.interface";
 
 const steps = [
   "Thông tin khách hàng",
@@ -19,7 +20,7 @@ const steps = [
 export default function PartyStepper() {
   const [activeStep, setActiveStep] = useState(0);
   const methods = useFormContext();
-  const { trigger, handleSubmit } = methods;
+  const { trigger, handleSubmit, getValues, setError, clearErrors } = methods;
   const navigate = useNavigate();
 
   const handleNext = async () => {
@@ -43,6 +44,53 @@ export default function PartyStepper() {
       const valid = await trigger(fieldsToValidate);
       if (!valid) return;
     }
+
+    const { tables, reserveTables, hall, foods } = getValues();
+    // Kiểm tra riêng cho các step
+    if (activeStep === 1) {
+      const totalTables = Number(tables) + Number(reserveTables);
+      
+      if (totalTables <= 0) {
+        setError("tables", {
+          type: "manual",
+          message: "Tổng số bàn phải lớn hơn 0"
+        });
+        setError("reserveTables", {
+          type: "manual",
+          message: "Tổng số bàn phải lớn hơn 0",
+        });
+        return;
+      } else if (totalTables > hall.maxTable) {
+        setError("tables", {
+          type: "manual",
+          message: "Tổng số bàn vượt quá số bàn tối đa của sảnh",
+        });
+        setError("reserveTables", {
+          type: "manual",
+          message: "Tổng số bàn vượt quá số bàn tối đa của sảnh",
+        });
+        return;
+      } else {
+        clearErrors("tables");
+        clearErrors("reserveTables")
+      }
+    }
+
+    if (activeStep === 2) {
+      const tablePrice = foods.reduce((sum: number, item: IFoodBooking) => sum + item.price, 0);
+
+      if (tablePrice < hall.minTablePrice) {
+        setError("foods", {
+          type: "manual",
+          message: "Chưa đạt đơn giá bàn tối thiểu",
+        });
+        return;
+      } else {
+        clearErrors("foods");
+      }
+    }
+
+
     setActiveStep((prev) => prev + 1);
   };
 

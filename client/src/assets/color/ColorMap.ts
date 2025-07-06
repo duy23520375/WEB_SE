@@ -15,11 +15,9 @@ export const defaultBgColorMap: ColorMap = {
     "Đã tổ chức": "#ccf0eb",        //green
     "Đã huỷ": "#fcd7d4",            //red
 
-    "Món khai vị": "#fff4c7",           // yellow
-    "Món chính": "#c7f4ff",             // blue 
-    "Món xào": "#ccf0eb",               // green
-    "Món cơm": "#fcd7d4",               // red
-    "Món tráng miệng": "#e0d4fc",       // purple
+    "Món Khai Vị": "#fff4c7",           // yellow
+    "Món Chính": "#c7f4ff",             // blue 
+    "Món Tráng Miệng": "#e0d4fc",       // purple
 };
 
 export const defaultTextColorMap: ColorMap = {
@@ -37,9 +35,7 @@ export const defaultTextColorMap: ColorMap = {
     "Đã tổ chức": "#00b69b",
     "Đã huỷ": "#ef3826",
     
-    "Món khai vị": "#d68b01",       // yellow
-    "Món chính": "#00a8c6",         // blue 
-    "Món xào": "#00b69b",           // green
-    "Món cơm": "#ef3826",           // red
-    "Món tráng miệng": "#6226ef",    // purple
+    "Món Khai Vị": "#d68b01",       // yellow
+    "Món Chính": "#00a8c6",         // blue 
+    "Món Tráng Miệng": "#6226ef",    // purple
 };
