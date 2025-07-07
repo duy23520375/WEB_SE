@@ -2,13 +2,12 @@ const express = require('express');
 const router = express.Router();
 const Tieccuoi = require('./../models/Tieccuoi')
 const Hoadon = require('./../models/Hoadon')
-
+const { v4: uuidv4 } = require('uuid');
 
 
 router.post('/', async (req, res) => {
   try {
-    const count = await Tieccuoi.countDocuments();
-    const newMaTiec = `TC${String(count + 1).padStart(2, '0')}`;
+    const newMaTiec = uuidv4();
 
     const data = req.body;
     data.MATIEC = newMaTiec;
